@@ -8,7 +8,7 @@
     "lint-fix": "eslint --fix .",
     "test": "echo 'No tests implemented'",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpileOnly --inspect -- src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --inspect -- src/index.ts",
     "start": "node build/index.js"
   },
   "author": "Open Government Products, GovTech Singapore (https://open.gov.sg)",
@@ -55,6 +55,7 @@
     }
   },
   "dependencies": {
+    "@opengovsg/formsg-sdk": "^0.8.2",
     "convict": "^6.0.0",
     "express": "^4.17.1"
   }

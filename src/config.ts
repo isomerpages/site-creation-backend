@@ -34,6 +34,15 @@ const config = convict({
     format: 'int',
     default: 8080,
   },
+  formSecretKey: {
+    doc: 'The key given by FormSG to decrypt entries',
+    env: 'FORM_SECRET_KEY',
+    format: 'required-string',
+    default: '',
+    sensitive: true,
+  },
 })
+
+config.validate()
 
 export default config
