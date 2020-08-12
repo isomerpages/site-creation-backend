@@ -1,0 +1,38 @@
+import express from 'express'
+import { Request, Response, NextFunction } from 'express'
+
+import FormSG from '@opengovsg/formsg-sdk'
+import {
+  DecryptParams,
+  DecryptedContent,
+} from '@opengovsg/formsg-sdk/dist/types'
+
+import authenticate from './authenticate'
+import decrypt from './decrypt'
+
+export { authenticate, decrypt }
+
+interface CanDecryptFormSGPayload {
+  webhooks: {
+    authenticate: (header: string, uri: string) => void
+  }
+  crypto: {
+    decrypt: (
+      formSecretKey: string,
+      decryptParams: DecryptParams
+    ) => DecryptedContent | null
+  }
+}
+
+interface FormSGExpressOptions {
+  formsg: CanDecryptFormSGPayload
+}
+
+export default (
+  formSecretKey: string,
+  { formsg = FormSG() }: FormSGExpressOptions
+): Array<(req: Request, res: Response, next: NextFunction) => void> => [
+  authenticate(formsg.webhooks.authenticate),
+  express.json(),
+  decrypt(formSecretKey, formsg.crypto.decrypt),
+]

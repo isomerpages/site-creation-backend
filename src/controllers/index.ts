@@ -1,7 +1,6 @@
-import authenticate from './authenticate'
-import decrypt from './decrypt'
+import formsg from './formsg'
 import handleSubmission from './handle-submission'
 
-export { authenticate, decrypt, handleSubmission }
+export { formsg, handleSubmission }
 
-export default { authenticate, decrypt, handleSubmission }
+export default { formsg, handleSubmission }

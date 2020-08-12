@@ -4,11 +4,8 @@ import {
   DecryptedContent,
 } from '@opengovsg/formsg-sdk/dist/types'
 
-import config from '../config'
-
-const formSecretKey = config.get('formSecretKey')
-
 export default (
+  formSecretKey: string,
   decrypt: (
     formSecretKey: string,
     decryptParams: DecryptParams
@@ -28,7 +25,7 @@ export default (
       res.locals.submission = submission
       next()
     } else {
-      res.status(401).send({ message: 'Bad submission' })
+      res.status(422).send({ message: 'Bad submission' })
     }
   } catch (e) {
     console.error(e)

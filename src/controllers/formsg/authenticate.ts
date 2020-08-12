@@ -8,7 +8,7 @@ export default (authenticate: (signature: string, uri: string) => void) => (
   try {
     const signature = req.get('X-FormSG-Signature')
     if (!signature) {
-      res.status(401).send({ message: 'Unauthorized' })
+      res.status(401).send({ message: 'Signature missing' })
     } else {
       authenticate(
         signature,

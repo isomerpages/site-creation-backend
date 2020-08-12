@@ -1,18 +1,16 @@
 import express from 'express'
-import { authenticate, decrypt, handleSubmission } from './controllers'
+import morgan from 'morgan'
 
-import FormSG from '@opengovsg/formsg-sdk'
+import config from './config'
 
-const formsg = FormSG()
+import { formsg, handleSubmission } from './controllers'
+
+const formSecretKey = config.get('formSecretKey')
 
 const app = express()
 
-app.post(
-  '/sites',
-  authenticate(formsg.webhooks.authenticate),
-  express.json(),
-  decrypt(formsg.crypto.decrypt),
-  handleSubmission
-)
+app.use(morgan('common'))
+
+app.post('/sites', formsg(formSecretKey), handleSubmission)
 
 export default app
