@@ -34,7 +34,7 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
-    "ts-node-dev": "^1.0.0-pre.56",
+    "ts-node-dev": "^1.0.0-pre.63",
     "typescript": "^3.9.7"
   },
   "husky": {
