@@ -49,6 +49,39 @@ function createCollections(
   return result
 }
 
+function createResourceRoom(
+  repoName: string,
+  resourceRoom: { name: string; categories: string[] }
+) {
+  const result = {
+    navYaml: '',
+    configYaml: '',
+    files: [] as { path: string; content: string }[],
+  }
+  if (resourceRoom.name && resourceRoom.categories.length) {
+    const resourceRoomName = humanReadable(resourceRoom.name)
+    result.configYaml += `resources_name: ${resourceRoom.name}\n`
+    result.navYaml += `  - title: ${resourceRoomName}\n    resource_room: true\n`
+    for (const category of resourceRoom.categories) {
+      result.files.push(
+        {
+          path: `/tmp/${repoName}/${resourceRoom.name}/${category}/index.html`,
+          content: `---\nlayout: resources-alt\ntitle: ${resourceRoomName}\n---\n`,
+        },
+        {
+          path: `/tmp/${repoName}/${resourceRoom.name}/${category}/_posts/2019-01-01-test.md`,
+          content: `---\nlayout: post\ntitle: "Sample post for ${humanReadable(
+            category
+          )}"\npermalink: "/${
+            resourceRoom.name
+          }/${category}/test"\n---\nLorem ipsum sit amet\n`,
+        }
+      )
+    }
+  }
+  return result
+}
+
 export default ({
   repoName,
   pages,
@@ -60,7 +93,10 @@ export default ({
   collections: {
     [key: string]: string[]
   }
-  resourceRoom: any
+  resourceRoom: {
+    name: string
+    categories: string[]
+  }
 }): void => {
   // Copy isomerpages-base to /tmp
   fs.removeSync(`/tmp/${repoName}`)
@@ -81,12 +117,24 @@ export default ({
     fs.writeFileSync(file.path, file.content)
   }
 
+  const resourceRoomOutput = createResourceRoom(repoName, resourceRoom)
+  if (resourceRoom.name && resourceRoom.categories.length) {
+    for (const category of resourceRoom.categories) {
+      fs.mkdirpSync(`/tmp/${repoName}/${resourceRoom.name}/${category}/_posts`)
+    }
+  }
+  for (const file of resourceRoomOutput.files) {
+    fs.writeFileSync(file.path, file.content)
+  }
+
   let configFile = fs.readFileSync(configPath, 'utf-8')
   configFile += collectionsOutput.configYaml
+  configFile += resourceRoomOutput.configYaml
   fs.writeFileSync(configPath, configFile)
 
   let navFile = fs.readFileSync(navPath, 'utf-8')
   navFile += simplePagesOutput.navYaml
   navFile += collectionsOutput.navYaml
+  navFile += resourceRoomOutput.navYaml
   fs.writeFileSync(navPath, navFile)
 }
