@@ -51,7 +51,7 @@ function createCollections(
 
 function createResourceRoom(
   repoName: string,
-  resourceRoom: { name: string; categories: string[] }
+  resourceRoom: { name: string | undefined; categories: string[] }
 ) {
   const result = {
     navYaml: '',
@@ -94,7 +94,7 @@ export default ({
     [key: string]: string[]
   }
   resourceRoom: {
-    name: string
+    name: string | undefined
     categories: string[]
   }
 }): void => {
