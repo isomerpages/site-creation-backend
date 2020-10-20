@@ -30,7 +30,7 @@ interface FormSGExpressOptions {
 
 export default (
   formSecretKey: string,
-  { formsg = FormSG() }: FormSGExpressOptions
+  { formsg }: FormSGExpressOptions = { formsg: FormSG() }
 ): Array<(req: Request, res: Response, next: NextFunction) => void> => [
   authenticate(formsg.webhooks.authenticate),
   express.json(),
