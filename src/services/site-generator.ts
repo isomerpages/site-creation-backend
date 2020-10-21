@@ -7,7 +7,7 @@ function humanReadable(s: string) {
     .join(' ')
 }
 
-function createPages(repoName: string, pages: string[]) {
+function createPages(pages: string[]) {
   const result = {
     navYaml: '',
     files: [] as { path: string; content: string }[],
@@ -15,7 +15,7 @@ function createPages(repoName: string, pages: string[]) {
   for (const page of pages) {
     const humanReadableTitle = humanReadable(page)
     result.files.push({
-      path: `/tmp/${repoName}/pages/${page}.md`,
+      path: `pages/${page}.md`,
       content: `---\ntitle: ${humanReadableTitle}\npermalink: /${page}\n---\n`,
     })
     result.navYaml += `  - title: ${humanReadableTitle}\n    url: /${page}/\n`
@@ -23,10 +23,7 @@ function createPages(repoName: string, pages: string[]) {
   return result
 }
 
-function createCollections(
-  repoName: string,
-  collections: { [name: string]: string[] }
-) {
+function createCollections(collections: { [name: string]: string[] }) {
   const result = {
     navYaml: '',
     configYaml: '',
@@ -39,7 +36,7 @@ function createCollections(
     const humanReadableName = humanReadable(name)
     pages.forEach((page, index) => {
       result.files.push({
-        path: `/tmp/${repoName}/_${name}/${index}-${page}.md`,
+        path: `_${name}/${index}-${page}.md`,
         content: `---\ntitle: ${humanReadableName}\npermalink: /${name}/${page}/\n---\n`,
       })
     })
@@ -49,10 +46,10 @@ function createCollections(
   return result
 }
 
-function createResourceRoom(
-  repoName: string,
-  resourceRoom: { name: string | undefined; categories: string[] }
-) {
+function createResourceRoom(resourceRoom: {
+  name: string | undefined
+  categories: string[]
+}) {
   const result = {
     navYaml: '',
     configYaml: '',
@@ -65,11 +62,11 @@ function createResourceRoom(
     for (const category of resourceRoom.categories) {
       result.files.push(
         {
-          path: `/tmp/${repoName}/${resourceRoom.name}/${category}/index.html`,
+          path: `${resourceRoom.name}/${category}/index.html`,
           content: `---\nlayout: resources-alt\ntitle: ${resourceRoomName}\n---\n`,
         },
         {
-          path: `/tmp/${repoName}/${resourceRoom.name}/${category}/_posts/2019-01-01-test.md`,
+          path: `${resourceRoom.name}/${category}/_posts/2019-01-01-test.md`,
           content: `---\nlayout: post\ntitle: "Sample post for ${humanReadable(
             category
           )}"\npermalink: "/${
@@ -98,33 +95,35 @@ export default ({
     categories: string[]
   }
 }): void => {
-  // Copy isomerpages-base to /tmp
-  fs.removeSync(`/tmp/${repoName}`)
-  fs.copySync('./isomerpages-base', `/tmp/${repoName}`)
-  const configPath = `/tmp/${repoName}/_config.yml`
-  const navPath = `/tmp/${repoName}/_data/navigation.yml`
+  const destination = `/tmp/${repoName}`
 
-  const simplePagesOutput = createPages(repoName, pages)
+  // Copy isomerpages-base to /tmp
+  fs.removeSync(destination)
+  fs.copySync('./isomerpages-base', `${destination}`)
+  const configPath = `${destination}/_config.yml`
+  const navPath = `${destination}/_data/navigation.yml`
+
+  const simplePagesOutput = createPages(pages)
   for (const file of simplePagesOutput.files) {
-    fs.writeFileSync(file.path, file.content)
+    fs.writeFileSync(`${destination}/${file.path}`, file.content)
   }
 
-  const collectionsOutput = createCollections(repoName, collections)
+  const collectionsOutput = createCollections(collections)
   for (const name of Object.keys(collections)) {
-    fs.mkdirpSync(`/tmp/${repoName}/_${name}`)
+    fs.mkdirpSync(`${destination}/_${name}`)
   }
   for (const file of collectionsOutput.files) {
-    fs.writeFileSync(file.path, file.content)
+    fs.writeFileSync(`${destination}/${file.path}`, file.content)
   }
 
-  const resourceRoomOutput = createResourceRoom(repoName, resourceRoom)
+  const resourceRoomOutput = createResourceRoom(resourceRoom)
   if (resourceRoom.name && resourceRoom.categories.length) {
     for (const category of resourceRoom.categories) {
-      fs.mkdirpSync(`/tmp/${repoName}/${resourceRoom.name}/${category}/_posts`)
+      fs.mkdirpSync(`${destination}/${resourceRoom.name}/${category}/_posts`)
     }
   }
   for (const file of resourceRoomOutput.files) {
-    fs.writeFileSync(file.path, file.content)
+    fs.writeFileSync(`${destination}/${file.path}`, file.content)
   }
 
   let configFile = fs.readFileSync(configPath, 'utf-8')
