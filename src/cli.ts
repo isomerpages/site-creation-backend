@@ -30,12 +30,34 @@ const reservedArgumentKeys = [
   'repo-name',
 ]
 
-const { argv } = yargs(process.argv.slice(2)).options({
-  repoName: { type: 'string', demandOption: true },
-  pages: { type: 'array' },
-  resourceRoomName: { type: 'string' },
-  resourceRoomCategories: { type: 'array' },
-})
+const { argv } = yargs(process.argv.slice(2))
+  .usage(
+    '\nUsage:\n\n' +
+      '  $0 --repoName <name>\n' +
+      '    [--pages <page1-name> <page2-name>...]\n' +
+      '    [--resourceRoomName <name>] [--resourceRoomCategories <name> <name>...]\n' +
+      '    [--<category1-name> <category-page> <category-page>...]\n' +
+      '    [--<category2-name> <category-page> <category-page>...]...'
+  )
+  .options({
+    repoName: {
+      type: 'string',
+      describe: 'the name of the Isomer repository',
+      demandOption: true,
+    },
+    pages: {
+      type: 'array',
+      describe: 'a space- or comma-separated list of simple pages',
+    },
+    resourceRoomName: {
+      type: 'string',
+      describe: 'the name of the resource room',
+    },
+    resourceRoomCategories: {
+      type: 'array',
+      describe: 'a space- or comma-separated list of resource room categories',
+    },
+  })
 
 const { repoName } = argv
 
