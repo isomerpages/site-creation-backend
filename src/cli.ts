@@ -1,6 +1,17 @@
+#!/usr/bin/env node
+
+import winston from 'winston'
 import yargs from 'yargs'
 
 import generateSite from './services/site-generator'
+
+const logger = winston.createLogger({
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    }),
+  ],
+})
 
 function flattenArguments(rawArgument?: (string | number)[]): string[] {
   const argumentParts = (rawArgument || []).map((v) => v.toString().split(','))
@@ -52,3 +63,5 @@ for (const [collectionName, collectionPageArguments] of rawCollectionEntries) {
 }
 
 generateSite({ repoName, pages, collections, resourceRoom })
+
+logger.info(`Site created at /tmp/${repoName}`)

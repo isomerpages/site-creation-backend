@@ -2,14 +2,18 @@
   "name": "@isomerpages/site-creation-backend",
   "version": "1.0.0",
   "description": "Creates Isomer sites from FormSG site creation requests",
-  "main": "server/build/index.js",
+  "main": "build/index.js",
+  "bin": {
+    "generate-site": "./dist/cli.js"
+  },
   "scripts": {
     "lint": "eslint .",
     "lint-fix": "eslint --fix .",
     "test": "echo 'No tests implemented'",
     "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only --inspect -- src/index.ts",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "prepare": "npm run build"
   },
   "author": "Open Government Products, GovTech Singapore (https://open.gov.sg)",
   "private": true,
