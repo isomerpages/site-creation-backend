@@ -1,5 +1,17 @@
 import fs from 'fs-extra'
 
+export type SiteSpecification = {
+  repoName: string
+  pages: string[]
+  collections: {
+    [key: string]: string[]
+  }
+  resourceRoom: {
+    name: string | undefined
+    categories: string[]
+  }
+}
+
 function humanReadable(s: string) {
   return s
     .split('-')
@@ -84,17 +96,7 @@ export default ({
   pages,
   collections,
   resourceRoom,
-}: {
-  repoName: string
-  pages: string[]
-  collections: {
-    [key: string]: string[]
-  }
-  resourceRoom: {
-    name: string | undefined
-    categories: string[]
-  }
-}): void => {
+}: SiteSpecification): void => {
   const destination = `/tmp/${repoName}`
 
   // Copy isomerpages-base to /tmp
