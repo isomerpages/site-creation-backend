@@ -1,5 +1,33 @@
 import fs from 'fs-extra'
 
+const ISOMER_CONFIG = `
+description: An Isomer site of the Singapore Government
+
+##################################################################################################################
+# Everything below this line is Isomer-specific configuration. There should not be a need to edit these settings #
+##################################################################################################################
+permalink: none
+baseurl: ""
+exclude: [travis-script.js, .travis.yml, README.md, package.json, package-lock.json, node_modules, vendor/bundle/, vendor/cache/, vendor/gems/, vendor/ruby/, Gemfile, Gemfile.lock]
+include: [_redirects]
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "page"
+# Custom CSS file path
+custom_css_path: "/misc/custom.css"
+custom_print_css_path: "/assets/css/print.css"
+paginate: 12
+remote_theme: isomerpages/isomerpages-template@next-gen
+safe: false
+plugins:
+  - jekyll-feed
+  - jekyll-assets
+  - jekyll-paginate
+  - jekyll-sitemap
+`
+
 export type SiteSpecification = {
   repoName: string
   pages: string[]
@@ -49,7 +77,9 @@ function createCollections(collections: { [name: string]: string[] }) {
     pages.forEach((page, index) => {
       result.files.push({
         path: `_${name}/${index}-${page}.md`,
-        content: `---\ntitle: ${humanReadableName}\npermalink: /${name}/${page}/\n---\n`,
+        content: `---\ntitle: ${humanReadable(
+          page
+        )}\npermalink: /${name}/${page}/\n---\n`,
       })
     })
     result.navYaml += `  - title: ${humanReadableName}\n    collection: ${name}\n`
@@ -65,12 +95,14 @@ function createResourceRoom(resourceRoom: {
   const result = {
     navYaml: '',
     configYaml: '',
+    indexYaml: '',
     files: [] as { path: string; content: string }[],
   }
   if (resourceRoom.name && resourceRoom.categories.length) {
     const resourceRoomName = humanReadable(resourceRoom.name)
     result.configYaml += `resources_name: ${resourceRoom.name}\n`
     result.navYaml += `  - title: ${resourceRoomName}\n    resource_room: true\n`
+    result.indexYaml += `    - resources:\n        title: Media\n        subtitle: Learn more\n        button: View More`
     for (const category of resourceRoom.categories) {
       result.files.push(
         {
@@ -104,6 +136,7 @@ export default ({
   fs.copySync('./isomerpages-base', `${destination}`)
   const configPath = `${destination}/_config.yml`
   const navPath = `${destination}/_data/navigation.yml`
+  const indexPath = `${destination}/index.md`
 
   const simplePagesOutput = createPages(pages)
   for (const file of simplePagesOutput.files) {
@@ -131,6 +164,7 @@ export default ({
   let configFile = fs.readFileSync(configPath, 'utf-8')
   configFile += collectionsOutput.configYaml
   configFile += resourceRoomOutput.configYaml
+  configFile += ISOMER_CONFIG
   fs.writeFileSync(configPath, configFile)
 
   let navFile = fs.readFileSync(navPath, 'utf-8')
@@ -138,4 +172,9 @@ export default ({
   navFile += collectionsOutput.navYaml
   navFile += resourceRoomOutput.navYaml
   fs.writeFileSync(navPath, navFile)
+
+  let indexFile = fs.readFileSync(indexPath, 'utf-8')
+  indexFile += resourceRoomOutput.indexYaml
+  indexFile += '---\n\n'
+  fs.writeFileSync(indexPath, indexFile)
 }

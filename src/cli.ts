@@ -31,13 +31,16 @@ const reservedArgumentKeys = [
 ]
 
 const { argv } = yargs(process.argv.slice(2))
+  .parserConfiguration({
+    'camel-case-expansion': false,
+  })
   .usage(
     '\nUsage:\n\n' +
       '  $0 --repoName <name>\n' +
-      '    [--pages <page1-name> <page2-name>...]\n' +
-      '    [--resourceRoomName <name>] [--resourceRoomCategories <name> <name>...]\n' +
-      '    [--<category1-name> <category-page> <category-page>...]\n' +
-      '    [--<category2-name> <category-page> <category-page>...]...'
+      '    [--pages <page1-name>,<page2-name>...]\n' +
+      '    [--resourceRoomName <name>] [--resourceRoomCategories <name>,<name>...]\n' +
+      '    [--<category1-name> <category-page>,<category-page>...]\n' +
+      '    [--<category2-name> <category-page>,<category-page>...]...'
   )
   .options({
     repoName: {
@@ -47,7 +50,7 @@ const { argv } = yargs(process.argv.slice(2))
     },
     pages: {
       type: 'array',
-      describe: 'a space- or comma-separated list of simple pages',
+      describe: 'a comma-separated list of simple pages',
     },
     resourceRoomName: {
       type: 'string',
@@ -55,7 +58,7 @@ const { argv } = yargs(process.argv.slice(2))
     },
     resourceRoomCategories: {
       type: 'array',
-      describe: 'a space- or comma-separated list of resource room categories',
+      describe: 'a comma-separated list of resource room categories',
     },
   })
 
