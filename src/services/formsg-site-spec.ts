@@ -35,10 +35,10 @@ export default function ({
     ({ question }) => question === 'Page Collections (Name, Pages)'
   )
   if (collectionsResponse && collectionsResponse.answerArray) {
-    for (const [
-      name,
-      pageString,
-    ] of (collectionsResponse.answerArray as unknown) as string[][]) {
+    const answerArray = ((collectionsResponse.answerArray as unknown) as string[][]).filter(
+      (s) => s[0] !== '' && s[1] !== ''
+    )
+    for (const [name, pageString] of answerArray) {
       siteSpecification.collections[name] = pageString
         .split(',')
         .map((s) => s.trim())

@@ -41,6 +41,13 @@ const config = convict({
     default: '',
     sensitive: true,
   },
+  githubAccessToken: {
+    doc: 'The key given by GitHub for repo creation',
+    env: 'GITHUB_ACCESS_TOKEN',
+    format: 'required-string',
+    default: '',
+    sensitive: true,
+  },
 })
 
 config.validate()
