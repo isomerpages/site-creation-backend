@@ -3,13 +3,11 @@ import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 
 import makeSiteSpecification from '../services/formsg-site-spec'
 import generateSite from '../services/site-generator'
-import { GitHubPublisher } from '../services/github-publisher'
 
-export default (options: { gh: GitHubPublisher }) => async (
-  _req: Request,
-  res: Response
-): Promise<void> => {
-  const { gh } = options
+export default (options: {
+  publishToGitHub: (repoName: string) => Promise<void>
+}) => async (_req: Request, res: Response): Promise<void> => {
+  const { publishToGitHub } = options
 
   const siteSpecification = makeSiteSpecification(
     res.locals.submission as DecryptedContent
@@ -18,7 +16,7 @@ export default (options: { gh: GitHubPublisher }) => async (
   generateSite(siteSpecification)
 
   const { repoName } = siteSpecification
-  await gh.publish(repoName)
+  await publishToGitHub(repoName)
 
   res.json({ message: 'Done' })
 }
