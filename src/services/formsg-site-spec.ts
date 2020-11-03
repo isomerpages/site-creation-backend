@@ -27,9 +27,9 @@ export default function ({
     ({ question }) => question === 'Single Pages (Page Name)'
   )
   if (singlePagesResponse && singlePagesResponse.answerArray) {
-    siteSpecification.pages = siteSpecification.pages.concat(
-      ...singlePagesResponse.answerArray
-    )
+    siteSpecification.pages = siteSpecification.pages
+      .concat(...singlePagesResponse.answerArray)
+      .filter((s) => s !== '')
   }
   const collectionsResponse = responses.find(
     ({ question }) => question === 'Page Collections (Name, Pages)'

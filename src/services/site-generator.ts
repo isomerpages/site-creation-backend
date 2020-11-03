@@ -102,7 +102,7 @@ function createResourceRoom(resourceRoom: {
     const resourceRoomName = humanReadable(resourceRoom.name)
     result.configYaml += `resources_name: ${resourceRoom.name}\n`
     result.navYaml += `  - title: ${resourceRoomName}\n    resource_room: true\n`
-    result.indexYaml += `    - resources:\n        title: Media\n        subtitle: Learn more\n        button: View More`
+    result.indexYaml += `    - resources:\n        title: Media\n        subtitle: Learn more\n        button: View More\n`
     for (const category of resourceRoom.categories) {
       result.files.push(
         {
