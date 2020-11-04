@@ -7,8 +7,12 @@ export default ({
 }: {
   octokit: Octokit
   githubAccessToken: string
-}) => async (repoName: string): Promise<void> => {
-  await Promise.all([
+}) => async (repoName: string): Promise<number> => {
+  const [
+    {
+      data: { id: repoId },
+    },
+  ] = await Promise.all([
     octokit.repos.createInOrg({
       org: 'isomerpages',
       name: repoName,
@@ -70,4 +74,6 @@ export default ({
       permission: 'push',
     }),
   ])
+
+  return repoId
 }

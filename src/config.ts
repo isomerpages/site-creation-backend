@@ -31,7 +31,7 @@ const config = convict({
   port: {
     doc: 'The port that the service listens on',
     env: 'PORT',
-    format: 'int',
+    format: 'port',
     default: 8080,
   },
   formSecretKey: {
@@ -47,6 +47,20 @@ const config = convict({
     format: 'required-string',
     default: '',
     sensitive: true,
+  },
+  netlifyAccessToken: {
+    doc: 'The key given by Netlify for site creation',
+    env: 'NETLIFY_ACCESS_TOKEN',
+    format: '*',
+    default: '',
+    sensitive: true,
+  },
+  netlifyAppId: {
+    doc:
+      'The id number of the Netlify App installed on the GitHub organisation',
+    env: 'NETLIFY_APP_ID',
+    format: 'int',
+    default: 0,
   },
 })
 
