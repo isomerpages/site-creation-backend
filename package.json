@@ -39,8 +39,7 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "prettier": "^2.0.5",
-    "ts-node-dev": "^1.0.0-pre.63",
-    "typescript": "^4.0.3"
+    "ts-node-dev": "^1.0.0-pre.63"
   },
   "husky": {
     "hooks": {
@@ -70,6 +69,8 @@
     "isomorphic-git": "^1.7.8",
     "morgan": "^1.10.0",
     "netlify": "^4.9.0",
+    "serverless-http": "^2.6.0",
+    "typescript": "^4.0.5",
     "winston": "^3.3.3",
     "yargs": "^16.1.0"
   }

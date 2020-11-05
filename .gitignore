@@ -68,3 +68,6 @@ build
 backend/build
 frontend/build
 dist
+
+# Serverless
+.serverless

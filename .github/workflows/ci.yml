@@ -3,6 +3,8 @@ on:
   push:
   pull_request:
     types: [opened, reopened]
+env:
+  PRODUCTION_BRANCH: refs/heads/master
 jobs:
   lint:
     name: Lint
@@ -45,3 +47,43 @@ jobs:
             ${{ runner.OS }}-
       - run: npm ci
       - run: npm test
+  gatekeep:
+    name: Determine if Build & Deploy is needed
+    outputs:
+      proceed: ${{ steps.determine_proceed.outputs.proceed }}
+    runs-on: ubuntu-18.04
+    if: github.event_name == 'push'
+    steps:
+      - shell: python
+        id: determine_proceed
+        run: |
+          import os
+          ref = os.environ['GITHUB_REF']
+          prod = os.environ['PRODUCTION_BRANCH']
+          if ref == prod:
+            print('::set-output name=proceed::true')
+          else:
+            print('::set-output name=proceed::false')
+  deploy:
+    name: deploy
+    runs-on: ubuntu-18.04
+    needs: [gatekeep]
+    if: needs.gatekeep.outputs.proceed == 'true'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - run: npm ci
+      - name: serverless deploy
+        uses: serverless/github-action@v2.1.0
+        with:
+          args: deploy --conceal -v
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.LAMBDA_GITHUB_ACCESS_TOKEN }}
+          NETLIFY_ACCESS_TOKEN: ${{ secrets.NETLIFY_ACCESS_TOKEN }}
+          NETLIFY_APP_ID: ${{ secrets.NETLIFY_APP_ID }}
+          FORM_CREATE_KEY: ${{ secrets.FORM_CREATE_KEY }}
