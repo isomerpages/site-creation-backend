@@ -5,15 +5,15 @@ import {
 } from '@opengovsg/formsg-sdk/dist/types'
 
 export default (
-  formSecretKey: string,
+  formCreateKey: string,
   decrypt: (
-    formSecretKey: string,
+    formCreateKey: string,
     decryptParams: DecryptParams
   ) => DecryptedContent | null
 ) => (req: Request, res: Response, next: NextFunction): void => {
   try {
     const submission = decrypt(
-      formSecretKey,
+      formCreateKey,
       // If `verifiedContent` is provided in `req.body.data`, the return object
       // will include a verified key.
       req.body.data

@@ -18,7 +18,7 @@ interface CanDecryptFormSGPayload {
   }
   crypto: {
     decrypt: (
-      formSecretKey: string,
+      formCreateKey: string,
       decryptParams: DecryptParams
     ) => DecryptedContent | null
   }
@@ -29,10 +29,10 @@ interface FormSGExpressOptions {
 }
 
 export default (
-  formSecretKey: string,
+  formCreateKey: string,
   { formsg }: FormSGExpressOptions = { formsg: FormSG() }
 ): Array<(req: Request, res: Response, next: NextFunction) => void> => [
   authenticate(formsg.webhooks.authenticate),
   express.json(),
-  decrypt(formSecretKey, formsg.crypto.decrypt),
+  decrypt(formCreateKey, formsg.crypto.decrypt),
 ]

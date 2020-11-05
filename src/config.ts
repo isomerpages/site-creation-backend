@@ -34,9 +34,9 @@ const config = convict({
     format: 'port',
     default: 8080,
   },
-  formSecretKey: {
-    doc: 'The key given by FormSG to decrypt entries',
-    env: 'FORM_SECRET_KEY',
+  formCreateKey: {
+    doc: 'The key given by FormSG to decrypt create requests',
+    env: 'FORM_CREATE_KEY',
     format: 'required-string',
     default: '',
     sensitive: true,

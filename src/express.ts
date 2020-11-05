@@ -10,7 +10,7 @@ import { formsg, handleSubmission } from './controllers'
 import makeGitHubPublisher from './services/github-publisher'
 import makeNetlifyPublisher from './services/netlify-publisher'
 
-const formSecretKey = config.get('formSecretKey')
+const formCreateKey = config.get('formCreateKey')
 const githubAccessToken = config.get('githubAccessToken')
 const netlifyAccessToken = config.get('netlifyAccessToken')
 const netlifyAppId = config.get('netlifyAppId')
@@ -32,7 +32,7 @@ app.use(morgan('common'))
 
 app.post(
   '/sites',
-  formsg(formSecretKey),
+  formsg(formCreateKey),
   handleSubmission({ publishToGitHub, publishToNetlify })
 )
 
