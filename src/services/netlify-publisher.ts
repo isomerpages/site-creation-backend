@@ -23,9 +23,11 @@ export default ({
     read_only: true,
   })
   await Promise.all([
-    netlify.createSite({
+    netlify.createSiteInTeam({
+      account_slug: 'isomer',
       body: {
         name: `${repoName}-staging`,
+        account_slug: 'isomer',
         repo: {
           provider: 'github',
           id: repoId,
@@ -39,9 +41,11 @@ export default ({
         },
       },
     }),
-    netlify.createSite({
+    netlify.createSiteInTeam({
+      account_slug: 'isomer',
       body: {
         name: `${repoName}-prod`,
+        account_slug: 'isomer',
         repo: {
           provider: 'github',
           id: repoId,

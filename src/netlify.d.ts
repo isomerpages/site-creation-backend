@@ -40,7 +40,8 @@ declare module 'netlify' {
   export default class NetlifyAPI {
     constructor(token: string)
     createDeployKey: () => Promise<{ id: string; public_key: string }>
-    createSite: (site: {
+    createSiteInTeam: (site: {
+      account_slug: string
       body: CreateSiteRequest
     }) => Promise<CreateSiteResponse>
   }
