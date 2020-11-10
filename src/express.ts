@@ -32,7 +32,7 @@ app.use(morgan('common'))
 
 app.post(
   '/sites',
-  formsg(formCreateKey),
+  formsg({ formCreateKey }),
   handleSubmission({ publishToGitHub, publishToNetlify })
 )
 

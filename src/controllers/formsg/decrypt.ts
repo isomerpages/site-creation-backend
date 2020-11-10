@@ -4,13 +4,16 @@ import {
   DecryptedContent,
 } from '@opengovsg/formsg-sdk/dist/types'
 
-export default (
-  formCreateKey: string,
+export default ({
+  formCreateKey,
+  decrypt,
+}: {
+  formCreateKey: string
   decrypt: (
     formCreateKey: string,
     decryptParams: DecryptParams
   ) => DecryptedContent | null
-) => (req: Request, res: Response, next: NextFunction): void => {
+}) => (req: Request, res: Response, next: NextFunction): void => {
   try {
     const submission = decrypt(
       formCreateKey,

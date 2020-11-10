@@ -4,4 +4,4 @@ import config from './config'
 
 const port = config.get('port')
 
-app.listen(port, () => console.log(`Listening on port ${port}`))
+app.listen(port)
