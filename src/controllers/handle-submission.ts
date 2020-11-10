@@ -3,6 +3,7 @@ import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 
 import makeSiteSpecification from '../services/formsg-site-spec'
 import generateSite from '../services/site-generator'
+import winston from 'winston'
 
 export default (options: {
   publishToGitHub: (repoName: string) => Promise<number>
@@ -10,8 +11,9 @@ export default (options: {
     repoName: string
     repoId: number
   }) => Promise<void>
+  logger?: winston.Logger
 }) => async (_req: Request, res: Response): Promise<void> => {
-  const { publishToGitHub, publishToNetlify } = options
+  const { publishToGitHub, publishToNetlify, logger } = options
 
   try {
     const siteSpecification = makeSiteSpecification(
@@ -24,7 +26,7 @@ export default (options: {
     const repoId = await publishToGitHub(repoName)
     await publishToNetlify({ repoName, repoId })
   } catch (err) {
-    console.error(err)
+    logger?.error(err)
   }
   res.json({ message: 'Done' })
 }

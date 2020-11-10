@@ -3,16 +3,19 @@ import {
   DecryptParams,
   DecryptedContent,
 } from '@opengovsg/formsg-sdk/dist/types'
+import winston from 'winston'
 
 export default ({
   formCreateKey,
   decrypt,
+  logger,
 }: {
   formCreateKey: string
   decrypt: (
     formCreateKey: string,
     decryptParams: DecryptParams
   ) => DecryptedContent | null
+  logger?: winston.Logger
 }) => (req: Request, res: Response, next: NextFunction): void => {
   try {
     const submission = decrypt(
@@ -31,7 +34,7 @@ export default ({
       res.status(422).send({ message: 'Bad submission' })
     }
   } catch (e) {
-    console.error(e)
+    logger?.error(e)
     res.status(401).send({ message: 'Unauthorized' })
   }
 }

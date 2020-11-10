@@ -1,9 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
+import winston from 'winston'
 
 export default ({
   authenticate,
+  logger,
 }: {
   authenticate: (signature: string, uri: string) => void
+  logger?: winston.Logger
 }) => (req: Request, res: Response, next: NextFunction): void => {
   try {
     const signature = req.get('X-FormSG-Signature')
@@ -18,7 +21,7 @@ export default ({
       next()
     }
   } catch (e) {
-    console.error(e)
+    logger?.error(e)
     res.status(401).send({ message: 'Unauthorized' })
   }
 }

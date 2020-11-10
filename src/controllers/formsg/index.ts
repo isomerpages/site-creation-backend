@@ -9,6 +9,7 @@ import {
 
 import authenticate from './authenticate'
 import decrypt from './decrypt'
+import winston from 'winston'
 
 export { authenticate, decrypt }
 
@@ -27,15 +28,17 @@ interface CanDecryptFormSGPayload {
 interface FormSGExpressOptions {
   formCreateKey: string
   formsg?: CanDecryptFormSGPayload
+  logger?: winston.Logger
 }
 
 export default ({
   formCreateKey,
   formsg = FormSG(),
+  logger,
 }: FormSGExpressOptions): Array<
   (req: Request, res: Response, next: NextFunction) => void
 > => [
-  authenticate({ authenticate: formsg.webhooks.authenticate }),
+  authenticate({ authenticate: formsg.webhooks.authenticate, logger }),
   express.json(),
-  decrypt({ formCreateKey, decrypt: formsg.crypto.decrypt }),
+  decrypt({ formCreateKey, decrypt: formsg.crypto.decrypt, logger }),
 ]

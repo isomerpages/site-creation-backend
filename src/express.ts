@@ -1,5 +1,6 @@
 import express from 'express'
 import morgan from 'morgan'
+import winston from 'winston'
 
 import NetlifyAPI from 'netlify'
 import { Octokit } from '@octokit/rest'
@@ -14,6 +15,14 @@ const formCreateKey = config.get('formCreateKey')
 const githubAccessToken = config.get('githubAccessToken')
 const netlifyAccessToken = config.get('netlifyAccessToken')
 const netlifyAppId = config.get('netlifyAppId')
+
+const logger = winston.createLogger({
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.simple()
+  ),
+  transports: [new winston.transports.Console()],
+})
 
 const octokit = new Octokit({ auth: githubAccessToken })
 const publishToGitHub = makeGitHubPublisher({ octokit, githubAccessToken })
@@ -32,8 +41,8 @@ app.use(morgan('common'))
 
 app.post(
   '/sites',
-  formsg({ formCreateKey }),
-  handleSubmission({ publishToGitHub, publishToNetlify })
+  formsg({ formCreateKey, logger }),
+  handleSubmission({ publishToGitHub, publishToNetlify, logger })
 )
 
 export default app
