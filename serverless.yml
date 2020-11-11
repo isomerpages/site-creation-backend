@@ -12,6 +12,12 @@ provider:
     GITHUB_ACCESS_TOKEN: ${env:GITHUB_ACCESS_TOKEN}
     NETLIFY_ACCESS_TOKEN: ${env:NETLIFY_ACCESS_TOKEN}
     NETLIFY_APP_ID: ${env:NETLIFY_APP_ID}
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'ses:SendRawEmail'
+      Resource:
+        '*'
 
 functions:
   sites:
