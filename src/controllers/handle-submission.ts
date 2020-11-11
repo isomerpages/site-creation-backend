@@ -11,22 +11,51 @@ export default (options: {
     repoName: string
     repoId: number
   }) => Promise<void>
+  mailOutcome: (options: {
+    to: string
+    submissionId: string
+    repoName: string
+    error?: Error
+  }) => Promise<void>
   logger?: winston.Logger
-}) => async (_req: Request, res: Response): Promise<void> => {
-  const { publishToGitHub, publishToNetlify, logger } = options
+}) => async (req: Request, res: Response): Promise<void> => {
+  const { publishToGitHub, publishToNetlify, mailOutcome, logger } = options
+  const { submissionId } = req.body.data
+
+  logger?.info(`[${submissionId}] Handling submission`)
+  let statusCode = 201
+
+  const { responses } = res.locals.submission as DecryptedContent
+  const siteSpecification = makeSiteSpecification({ responses })
+  const { repoName } = siteSpecification
+
+  let to = ''
+
+  const requestorEmailResponse = responses.find(
+    ({ question }) => question === 'Government E-mail'
+  )
+  if (requestorEmailResponse && requestorEmailResponse.answer) {
+    to = requestorEmailResponse.answer
+  }
 
   try {
-    const siteSpecification = makeSiteSpecification(
-      res.locals.submission as DecryptedContent
-    )
-
     generateSite(siteSpecification)
 
-    const { repoName } = siteSpecification
+    logger?.info(`[${submissionId}] Publishing to GitHub`)
     const repoId = await publishToGitHub(repoName)
+
+    logger?.info(`[${submissionId}] Publishing to Netlify`)
     await publishToNetlify({ repoName, repoId })
-  } catch (err) {
-    logger?.error(err)
+
+    logger?.info(`[${submissionId}] Mailing outcome`)
+    await mailOutcome({ to, submissionId, repoName })
+  } catch (error) {
+    statusCode = 400
+    logger?.error(error)
+    await mailOutcome({ to, submissionId, repoName, error })
+  } finally {
+    const message =
+      statusCode !== 201 ? 'Request processed with errors' : 'Request processed'
+    res.status(statusCode).json({ message })
   }
-  res.json({ message: 'Done' })
 }

@@ -34,6 +34,24 @@ const config = convict({
     format: 'port',
     default: 8080,
   },
+  nodeEnv: {
+    doc: 'The Node.js Environment',
+    env: 'NODE_ENV',
+    format: 'required-string',
+    default: 'production',
+  },
+  awsRegion: {
+    doc: 'The AWS region',
+    env: 'AWS_REGION',
+    format: 'required-string',
+    default: 'ap-southeast-1',
+  },
+  supportEmail: {
+    doc: 'The e-mail of the sender for outcome e-mails',
+    env: 'SUPPORT_EMAIL',
+    format: 'required-string',
+    default: 'support@isomer.gov.sg',
+  },
   formCreateKey: {
     doc: 'The key given by FormSG to decrypt create requests',
     env: 'FORM_CREATE_KEY',
