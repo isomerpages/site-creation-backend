@@ -103,19 +103,20 @@ function createResourceRoom(resourceRoom: {
     result.configYaml += `resources_name: ${resourceRoom.name}\n`
     result.navYaml += `  - title: ${resourceRoomName}\n    resource_room: true\n`
     result.indexYaml += `    - resources:\n        title: Media\n        subtitle: Learn more\n        button: View More\n`
+    result.files.push({
+      path: `${resourceRoom.name}/index.html`,
+      content: `---\nlayout: resources\ntitle: ${resourceRoomName}\n---\n`,
+    })
     for (const category of resourceRoom.categories) {
+      const categoryName = humanReadable(category)
       result.files.push(
         {
           path: `${resourceRoom.name}/${category}/index.html`,
-          content: `---\nlayout: resources-alt\ntitle: ${resourceRoomName}\n---\n`,
+          content: `---\nlayout: resources-alt\ntitle: ${categoryName}\n---\n`,
         },
         {
           path: `${resourceRoom.name}/${category}/_posts/2019-01-01-test.md`,
-          content: `---\nlayout: post\ntitle: "Sample post for ${humanReadable(
-            category
-          )}"\npermalink: "/${
-            resourceRoom.name
-          }/${category}/test"\n---\nLorem ipsum sit amet\n`,
+          content: `---\nlayout: post\ntitle: "Sample post for ${categoryName}"\npermalink: "/${resourceRoom.name}/${category}/test"\n---\nLorem ipsum sit amet\n`,
         }
       )
     }
