@@ -1,8 +1,8 @@
 import { Request, Response } from 'express'
 import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 
-import makeSiteSpecification from '../services/formsg-site-spec'
-import generateSite from '../services/site-generator'
+import makeSiteSpecification from '../services/create-site/formsg-site-spec'
+import generateSite from '../services/create-site/site-generator'
 import winston from 'winston'
 
 export default (options: {

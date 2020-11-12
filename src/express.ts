@@ -10,10 +10,10 @@ import nodemailer, { SendMailOptions } from 'nodemailer'
 
 import config from './config'
 
-import { formsg, handleSubmission } from './controllers'
-import makeGitHubPublisher from './services/github-publisher'
-import makeNetlifyPublisher from './services/netlify-publisher'
-import makeOutcomeMailer from './services/outcome-mailer'
+import { formsg, createSite } from './controllers'
+import makeGitHubPublisher from './services/create-site/github-publisher'
+import makeNetlifyPublisher from './services/create-site/netlify-publisher'
+import makeCreateOutcomeMailer from './services/create-site/outcome-mailer'
 
 const formCreateKey = config.get('formCreateKey')
 const githubAccessToken = config.get('githubAccessToken')
@@ -53,7 +53,11 @@ const transport =
           logger.info(`Mail sent - ${JSON.stringify(options, null, 2)}`),
       }
 
-const mailOutcome = makeOutcomeMailer({ transport, supportEmail, logger })
+const mailCreateOutcome = makeCreateOutcomeMailer({
+  transport,
+  supportEmail,
+  logger,
+})
 
 const app = express()
 
@@ -62,7 +66,12 @@ app.use(morgan('common'))
 app.post(
   '/sites',
   formsg({ formCreateKey, logger }),
-  handleSubmission({ publishToGitHub, publishToNetlify, mailOutcome, logger })
+  createSite({
+    publishToGitHub,
+    publishToNetlify,
+    mailOutcome: mailCreateOutcome,
+    logger,
+  })
 )
 
 export default app

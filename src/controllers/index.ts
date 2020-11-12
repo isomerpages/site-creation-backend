@@ -1,6 +1,6 @@
 import formsg from './formsg'
-import handleSubmission from './handle-submission'
+import createSite from './create-site'
 
-export { formsg, handleSubmission }
+export { formsg, createSite }
 
-export default { formsg, handleSubmission }
+export default { formsg, createSite }

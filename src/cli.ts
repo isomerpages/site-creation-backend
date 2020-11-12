@@ -3,7 +3,7 @@
 import winston from 'winston'
 import yargs from 'yargs'
 
-import generateSite from './services/site-generator'
+import generateSite from './services/create-site/site-generator'
 
 const logger = winston.createLogger({
   transports: [
