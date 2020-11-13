@@ -37,7 +37,6 @@ const publishToGitHub = makeGitHubPublisher({ octokit, githubAccessToken })
 const publishToNetlify =
   netlifyAccessToken && netlifyAppId
     ? makeNetlifyPublisher({
-        octokit,
         netlifyAppId,
         netlify: new NetlifyAPI(netlifyAccessToken),
       })
