@@ -55,12 +55,19 @@ const config = convict({
   formCreateKey: {
     doc: 'The key given by FormSG to decrypt create requests',
     env: 'FORM_CREATE_KEY',
-    format: 'required-string',
+    format: '*',
+    default: '',
+    sensitive: true,
+  },
+  formUsersKey: {
+    doc: 'The key given by FormSG to decrypt user management requests',
+    env: 'FORM_USERS_KEY',
+    format: '*',
     default: '',
     sensitive: true,
   },
   githubAccessToken: {
-    doc: 'The key given by GitHub for repo creation',
+    doc: 'The key given by GitHub',
     env: 'GITHUB_ACCESS_TOKEN',
     format: 'required-string',
     default: '',

@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
+import winston from 'winston'
+
 import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 
 import makeSiteSpecification from '../services/create-site/formsg-site-spec'
 import generateSite from '../services/create-site/site-generator'
-import winston from 'winston'
 
 export default (options: {
   publishToGitHub: (repoName: string) => Promise<number>
@@ -22,7 +23,7 @@ export default (options: {
   const { publishToGitHub, publishToNetlify, mailOutcome, logger } = options
   const { submissionId } = req.body.data
 
-  logger?.info(`[${submissionId}] Handling submission`)
+  logger?.info(`[${submissionId}] Handling create-site submission`)
   let statusCode = 201
 
   const { responses } = res.locals.submission as DecryptedContent

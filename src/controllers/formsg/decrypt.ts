@@ -6,20 +6,20 @@ import {
 import winston from 'winston'
 
 export default ({
-  formCreateKey,
+  formKey,
   decrypt,
   logger,
 }: {
-  formCreateKey: string
+  formKey: string
   decrypt: (
-    formCreateKey: string,
+    formKey: string,
     decryptParams: DecryptParams
   ) => DecryptedContent | null
   logger?: winston.Logger
 }) => (req: Request, res: Response, next: NextFunction): void => {
   try {
     const submission = decrypt(
-      formCreateKey,
+      formKey,
       // If `verifiedContent` is provided in `req.body.data`, the return object
       // will include a verified key.
       req.body.data

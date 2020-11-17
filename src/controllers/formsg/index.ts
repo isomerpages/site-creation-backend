@@ -26,13 +26,13 @@ interface CanDecryptFormSGPayload {
 }
 
 interface FormSGExpressOptions {
-  formCreateKey: string
+  formKey: string
   formsg?: CanDecryptFormSGPayload
   logger?: winston.Logger
 }
 
 export default ({
-  formCreateKey,
+  formKey,
   formsg = FormSG(),
   logger,
 }: FormSGExpressOptions): Array<
@@ -40,5 +40,5 @@ export default ({
 > => [
   authenticate({ authenticate: formsg.webhooks.authenticate, logger }),
   express.json(),
-  decrypt({ formCreateKey, decrypt: formsg.crypto.decrypt, logger }),
+  decrypt({ formKey, decrypt: formsg.crypto.decrypt, logger }),
 ]
