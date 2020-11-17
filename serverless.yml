@@ -29,3 +29,12 @@ functions:
       - http:
           path: sites
           method: post
+  users:
+    handler: dist/serverless.handler
+    timeout: 30
+    environment:
+      FORM_USERS_KEY: ${env:FORM_USERS_KEY}
+    events:
+      - http:
+          path: users
+          method: post

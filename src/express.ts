@@ -15,11 +15,12 @@ import makeGitHubPublisher from './services/create-site/github-publisher'
 import makeNetlifyPublisher from './services/create-site/netlify-publisher'
 import makeCreateOutcomeMailer from './services/create-site/outcome-mailer'
 
+import makeTeamManager from './services/manage-users/team-manager'
+import makeUsersOutcomeMailer from './services/manage-users/outcome-mailer'
+
 const formCreateKey = config.get('formCreateKey')
 const formUsersKey = config.get('formUsersKey')
 const githubAccessToken = config.get('githubAccessToken')
-const netlifyAccessToken = config.get('netlifyAccessToken')
-const netlifyAppId = config.get('netlifyAppId')
 
 const supportEmail = config.get('supportEmail')
 
@@ -50,6 +51,9 @@ app.use(morgan('common'))
 
 if (formCreateKey) {
   logger.info('Initializing middleware for /sites')
+  const netlifyAccessToken = config.get('netlifyAccessToken')
+  const netlifyAppId = config.get('netlifyAppId')
+
   const publishToGitHub = makeGitHubPublisher({ octokit, githubAccessToken })
   const publishToNetlify =
     netlifyAccessToken && netlifyAppId
@@ -59,7 +63,7 @@ if (formCreateKey) {
         })
       : () => Promise.resolve()
 
-  const mailCreateOutcome = makeCreateOutcomeMailer({
+  const mailOutcome = makeCreateOutcomeMailer({
     transport,
     supportEmail,
     logger,
@@ -70,7 +74,7 @@ if (formCreateKey) {
     createSite({
       publishToGitHub,
       publishToNetlify,
-      mailOutcome: mailCreateOutcome,
+      mailOutcome,
       logger,
     })
   )
@@ -78,12 +82,18 @@ if (formCreateKey) {
 
 if (formUsersKey) {
   logger.info('Initializing middleware for /users')
+  const manageTeam = makeTeamManager({ octokit })
+  const mailOutcome = makeUsersOutcomeMailer({
+    transport,
+    supportEmail,
+    logger,
+  })
   app.post(
     '/users',
     formsg({ formKey: formUsersKey, logger }),
     manageUsers({
-      manageTeam: Promise.resolve,
-      mailOutcome: Promise.resolve,
+      manageTeam,
+      mailOutcome,
       logger,
     })
   )
