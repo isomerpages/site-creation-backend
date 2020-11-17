@@ -10,8 +10,6 @@ provider:
     shouldStartNameWithService: true
   environment:
     GITHUB_ACCESS_TOKEN: ${env:GITHUB_ACCESS_TOKEN}
-    NETLIFY_ACCESS_TOKEN: ${env:NETLIFY_ACCESS_TOKEN}
-    NETLIFY_APP_ID: ${env:NETLIFY_APP_ID}
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
@@ -25,6 +23,8 @@ functions:
     timeout: 30
     environment:
       FORM_CREATE_KEY: ${env:FORM_CREATE_KEY}
+      NETLIFY_ACCESS_TOKEN: ${env:NETLIFY_ACCESS_TOKEN}
+      NETLIFY_APP_ID: ${env:NETLIFY_APP_ID}
     events:
       - http:
           path: sites
