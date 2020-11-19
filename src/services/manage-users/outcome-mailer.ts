@@ -24,6 +24,11 @@ ${error}
 const successText = (teamName: string, users: UserManagementResults) => `
 User management for ${teamName} has been executed successfully! 
 
+Users who are new to Isomer will be sent a GitHub invitation via e-mail.
+They are to accept the invitation by following the instructions in the
+mail, or visiting https://github.com/isomerpages and following the 
+instructions there.
+
 The following users have been added:
 ${users.add.join('\n')}
 
