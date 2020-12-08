@@ -77,14 +77,22 @@ const rawCollectionEntries = Object.entries(argv).filter(
 )
 
 const collections: {
-  [key: string]: string[]
+  [page: string]: {
+    [subPage: string]: string[]
+  }
 } = {}
 
 for (const [collectionName, collectionPageArguments] of rawCollectionEntries) {
   const collectionPages = ([] as string[]).concat(
     collectionPageArguments as string[] | string
   )
-  collections[collectionName] = flattenArguments(collectionPages)
+  const collectionPageAsKeys: {
+    [subPage: string]: string[]
+  } = {}
+  for (const collectionPage of flattenArguments(collectionPages)) {
+    collectionPageAsKeys[collectionPage] = []
+  }
+  collections[collectionName] = collectionPageAsKeys
 }
 
 generateSite({ repoName, pages, collections, resourceRoom })

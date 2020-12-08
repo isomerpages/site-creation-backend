@@ -32,16 +32,23 @@ export default function ({
       .filter((s) => s !== '')
   }
   const collectionsResponse = responses.find(
-    ({ question }) => question === 'Page Collections (Name, Pages)'
+    ({ question }) =>
+      question === 'Page Collections (Collection, Page, Sub-Page)'
   )
   if (collectionsResponse && collectionsResponse.answerArray) {
     const answerArray = ((collectionsResponse.answerArray as unknown) as string[][]).filter(
       (s) => s[0] !== '' && s[1] !== ''
     )
-    for (const [name, pageString] of answerArray) {
-      siteSpecification.collections[name] = pageString
-        .split(',')
-        .map((s) => s.trim())
+    for (const [name, page, subPage] of answerArray) {
+      if (!siteSpecification.collections[name]) {
+        siteSpecification.collections[name] = {}
+      }
+      if (!siteSpecification.collections[name][page]) {
+        siteSpecification.collections[name][page] = []
+      }
+      if (subPage !== '') {
+        siteSpecification.collections[name][page].push(subPage)
+      }
     }
   }
   const resourceRoomNameResponse = responses.find(

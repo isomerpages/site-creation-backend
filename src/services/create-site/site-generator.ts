@@ -32,7 +32,9 @@ export type SiteSpecification = {
   repoName: string
   pages: string[]
   collections: {
-    [key: string]: string[]
+    [collection: string]: {
+      [page: string]: string[]
+    }
   }
   resourceRoom: {
     name: string | undefined
@@ -63,7 +65,9 @@ function createPages(pages: string[]) {
   return result
 }
 
-function createCollections(collections: { [name: string]: string[] }) {
+function createCollections(collections: {
+  [page: string]: { [subPage: string]: string[] }
+}) {
   const result = {
     navYaml: '',
     configYaml: '',
@@ -74,13 +78,31 @@ function createCollections(collections: { [name: string]: string[] }) {
   }
   for (const [name, pages] of Object.entries(collections)) {
     const humanReadableName = humanReadable(name)
-    pages.forEach((page, index) => {
-      result.files.push({
-        path: `_${name}/${index}-${page}.md`,
-        content: `---\ntitle: ${humanReadable(
-          page
-        )}\npermalink: /${name}/${page}/\n---\n`,
-      })
+    Object.entries(pages).forEach(([page, subPages], index) => {
+      if (subPages.length === 0) {
+        result.files.push({
+          path: `_${name}/${index}-${page}.md`,
+          content: `---\ntitle: ${humanReadable(
+            page
+          )}\npermalink: /${name}/${page}/\n---\n`,
+        })
+      } else {
+        // Impose a hard limit of `alphabet.length` sub-pages
+        // To keep the code simple
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz'
+        subPages.slice(0, alphabet.length).forEach((subPage, subIndex) => {
+          result.files.push({
+            path: `_${name}/${index}${alphabet.charAt(
+              subIndex
+            )}-${page}-${subPage}.md`,
+            content: `---\ntitle: ${humanReadable(
+              subPage
+            )}\npermalink: /${name}/${page}/${subPage}\nthird_nav_title: ${humanReadable(
+              page
+            )}\n---\n`,
+          })
+        })
+      }
     })
     result.navYaml += `  - title: ${humanReadableName}\n    collection: ${name}\n`
     result.configYaml += `  ${name}:\n    output: true\n`
