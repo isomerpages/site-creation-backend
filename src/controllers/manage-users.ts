@@ -5,6 +5,32 @@ import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 import { UserInstructions } from '../services/manage-users/formsg-user-instructions'
 import makeUserInstructions from '../services/manage-users/formsg-user-instructions'
 
+type UserManagementResults = {
+  add: string[]
+  remove: string[]
+  notFound: string[]
+}
+
+const onSuccess = (teamName: string, users: UserManagementResults) => () => `
+User management for ${teamName} has been executed successfully! 
+
+Users who are new to Isomer will be sent a GitHub invitation via e-mail.
+They are to accept the invitation by following the instructions in the
+mail, or visiting https://github.com/isomerpages and following the 
+instructions there.
+
+The following users have been added:
+${users.add.join('\n')}
+
+The following users have been removed:
+${users.remove.join('\n')}
+
+The following users were not found:
+${users.notFound.join('\n')}
+`
+
+const action = 'managing users for'
+
 export default ({
   manageTeam,
   mailOutcome,
@@ -12,15 +38,12 @@ export default ({
 }: {
   manageTeam: (userInstructions: UserInstructions) => Promise<string[]>
   mailOutcome: (options: {
-    to: string[]
+    to: string | string[]
     submissionId: string
-    teamName: string
-    users: {
-      add: string[]
-      remove: string[]
-      notFound: string[]
-    }
+    repoName: string
+    action: string
     error?: Error
+    successText?: (supportEmail: string) => string
   }) => Promise<void>
   logger?: winston.Logger
 }) => async (req: Request, res: Response): Promise<void> => {
@@ -53,12 +76,18 @@ export default ({
     if (!users.notFound.length) {
       users.notFound.push('N/A')
     }
-
-    await mailOutcome({ to, submissionId, users, teamName })
+    const successText = onSuccess(teamName, users)
+    await mailOutcome({
+      to,
+      submissionId,
+      repoName: teamName,
+      action,
+      successText,
+    })
   } catch (error) {
     statusCode = 400
     logger?.error(error)
-    await mailOutcome({ to, submissionId, users, teamName, error })
+    await mailOutcome({ to, submissionId, repoName: teamName, action, error })
   } finally {
     const message =
       statusCode !== 201 ? 'Request processed with errors' : 'Request processed'

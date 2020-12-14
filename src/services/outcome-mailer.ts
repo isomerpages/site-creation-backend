@@ -7,26 +7,12 @@ const errorText = (
   submissionId: string,
   error?: Error
 ) => `
-We were unable to create the Isomer site for ${repoName}.
+We were unable to perform the operation for ${repoName}.
 
 Please follow up by sending a mail to ${supportEmail},
 quoting the submission id [${submissionId}] and the following error:
 
 ${error}
-`
-
-const successText = (repoName: string, supportEmail: string) => `
-The Isomer site for ${repoName} has been created successfully! 
-Please follow up by doing the following:
-
-Setup a GitHub account for yourself and others who will
-edit the site by following the instructions in the link below:
-https://v2.isomer.gov.sg/setup/create-a-github-account
-
-Send this mail to ${supportEmail} with your GitHub usernames 
-to give yourself and other users access to the repository.
-
-The Isomer guide is available at https://v2.isomer.gov.sg.
 `
 
 export default ({
@@ -43,19 +29,23 @@ export default ({
   to,
   submissionId,
   repoName,
+  action,
   error,
+  successText,
 }: {
-  to: string
+  to: string | string[]
   submissionId: string
   repoName: string
+  action: string
   error?: Error
+  successText?: (supportEmail: string) => string
 }): Promise<void> => {
   const subject = error
-    ? `[Isomer] Error creating ${repoName}`
-    : `[Isomer] ${repoName} created successfully`
+    ? `[Isomer] Error ${action} ${repoName}`
+    : `[Isomer] Success in ${action} ${repoName}`
   const text = error
     ? errorText(repoName, supportEmail, submissionId, error)
-    : successText(repoName, supportEmail)
+    : successText && successText(supportEmail)
   try {
     await transport.sendMail({
       to,

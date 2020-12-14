@@ -6,6 +6,22 @@ import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 import makeSiteSpecification from '../services/create-site/formsg-site-spec'
 import generateSite from '../services/create-site/site-generator'
 
+const onSuccess = (repoName: string) => (supportEmail: string) => `
+The Isomer site for ${repoName} has been created successfully! 
+Please follow up by doing the following:
+
+Setup a GitHub account for yourself and others who will
+edit the site by following the instructions in the link below:
+https://v2.isomer.gov.sg/setup/create-a-github-account
+
+Send this mail to ${supportEmail} with your GitHub usernames 
+to give yourself and other users access to the repository.
+
+The Isomer guide is available at https://v2.isomer.gov.sg.
+`
+
+const action = 'creating'
+
 export default (options: {
   publishToGitHub: (repoName: string) => Promise<number>
   publishToNetlify: (options: {
@@ -13,10 +29,12 @@ export default (options: {
     repoId: number
   }) => Promise<void>
   mailOutcome: (options: {
-    to: string
+    to: string | string[]
     submissionId: string
     repoName: string
+    action: string
     error?: Error
+    successText?: (supportEmail: string) => string
   }) => Promise<void>
   logger?: winston.Logger
 }) => async (req: Request, res: Response): Promise<void> => {
@@ -49,11 +67,12 @@ export default (options: {
     await publishToNetlify({ repoName, repoId })
 
     logger?.info(`[${submissionId}] Mailing outcome`)
-    await mailOutcome({ to, submissionId, repoName })
+    const successText = onSuccess(repoName)
+    await mailOutcome({ to, submissionId, repoName, action, successText })
   } catch (error) {
     statusCode = 400
     logger?.error(error)
-    await mailOutcome({ to, submissionId, repoName, error })
+    await mailOutcome({ to, submissionId, repoName, action, error })
   } finally {
     const message =
       statusCode !== 201 ? 'Request processed with errors' : 'Request processed'
