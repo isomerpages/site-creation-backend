@@ -38,3 +38,13 @@ functions:
       - http:
           path: users
           method: post
+  live:
+    handler: dist/serverless.handler
+    timeout: 30
+    environment:
+      FORM_LIVE_KEY: ${env:FORM_LIVE_KEY}
+      KEYCDN_ACCESS_TOKEN: ${env:KEYCDN_ACCESS_TOKEN}
+    events:
+      - http:
+          path: live
+          method: post

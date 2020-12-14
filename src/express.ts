@@ -10,15 +10,21 @@ import nodemailer, { SendMailOptions } from 'nodemailer'
 
 import config from './config'
 
-import { formsg, createSite, manageUsers } from './controllers'
+import { formsg, createSite, manageUsers, liveSite } from './controllers'
 import makeGitHubPublisher from './services/create-site/github-publisher'
 import makeNetlifyPublisher from './services/create-site/netlify-publisher'
 import makeOutcomeMailer from './services/outcome-mailer'
 
 import makeTeamManager from './services/manage-users/team-manager'
 
+import makeZoneCreator from './services/live-site/create-keycdn-zone'
+import verifyDns from './services/live-site/verify-dns'
+import makeZoneAliaser from './services/live-site/add-zone-alias'
+import makeDomainRedirector from './services/live-site/create-domain-redirect'
+
 const formCreateKey = config.get('formCreateKey')
 const formUsersKey = config.get('formUsersKey')
+const formLiveKey = config.get('formLiveKey')
 const githubAccessToken = config.get('githubAccessToken')
 
 const supportEmail = config.get('supportEmail')
@@ -87,6 +93,26 @@ if (formUsersKey) {
     formsg({ formKey: formUsersKey, logger }),
     manageUsers({
       manageTeam,
+      mailOutcome,
+      logger,
+    })
+  )
+}
+
+if (formLiveKey) {
+  logger.info('Initializing middleware for /live')
+  const keyCDNAccessToken = config.get('keyCDNAccessToken')
+  const createKeyCDNZone = makeZoneCreator({ keyCDNAccessToken })
+  const addZoneAlias = makeZoneAliaser({ keyCDNAccessToken })
+  const createDomainRedirect = makeDomainRedirector({ octokit })
+  app.post(
+    '/live',
+    formsg({ formKey: formLiveKey, logger }),
+    liveSite({
+      createKeyCDNZone,
+      verifyDns,
+      addZoneAlias,
+      createDomainRedirect,
       mailOutcome,
       logger,
     })

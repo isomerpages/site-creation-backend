@@ -86,5 +86,7 @@ jobs:
           GITHUB_ACCESS_TOKEN: ${{ secrets.LAMBDA_GITHUB_ACCESS_TOKEN }}
           NETLIFY_ACCESS_TOKEN: ${{ secrets.NETLIFY_ACCESS_TOKEN }}
           NETLIFY_APP_ID: ${{ secrets.NETLIFY_APP_ID }}
+          KEYCDN_ACCESS_TOKEN: ${{ secrets.KEYCDN_ACCESS_TOKEN }}
           FORM_CREATE_KEY: ${{ secrets.FORM_CREATE_KEY }}
           FORM_USERS_KEY: ${{ secrets.FORM_USERS_KEY }}
+          FORM_LIVE_KEY: ${{ secrets.FORM_LIVE_KEY }}

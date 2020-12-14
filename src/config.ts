@@ -66,6 +66,13 @@ const config = convict({
     default: '',
     sensitive: true,
   },
+  formLiveKey: {
+    doc: 'The key given by FormSG to decrypt site go-live requests',
+    env: 'FORM_LIVE_KEY',
+    format: '*',
+    default: '',
+    sensitive: true,
+  },
   githubAccessToken: {
     doc: 'The key given by GitHub',
     env: 'GITHUB_ACCESS_TOKEN',
@@ -86,6 +93,13 @@ const config = convict({
     env: 'NETLIFY_APP_ID',
     format: 'int',
     default: 0,
+  },
+  keyCDNAccessToken: {
+    doc: 'The key given by KeyCDN for Zone creation and aliasing',
+    env: 'KEYCDN_ACCESS_TOKEN',
+    format: '*',
+    default: '',
+    sensitive: true,
   },
 })
 
