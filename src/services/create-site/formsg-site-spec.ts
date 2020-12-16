@@ -55,7 +55,7 @@ export default function ({
     ({ question }) => question === 'Resource Room Name'
   )
   const resourceRoomCategoriesResponse = responses.find(
-    ({ question }) => question === 'Resource Types (Name)'
+    ({ question }) => question === 'Resource Categories (Name)'
   )
 
   if (
