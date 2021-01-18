@@ -1,7 +1,6 @@
 import { FormField } from '@opengovsg/formsg-sdk/dist/types'
 
 export type UserInstructions = {
-  adminEmail: string
   requesterEmail: string
   teamName: string
   users: {
@@ -16,19 +15,12 @@ export default function ({
   responses: FormField[]
 }): UserInstructions {
   const userInstructions: UserInstructions = {
-    adminEmail: '',
     requesterEmail: '',
     teamName: '',
     users: {
       add: [],
       remove: [],
     },
-  }
-  const adminEmailResponse = responses.find(
-    ({ question }) => question === "Site Administrator's E-mail"
-  )
-  if (adminEmailResponse && adminEmailResponse.answer) {
-    userInstructions.adminEmail = adminEmailResponse.answer
   }
 
   const requesterEmailResponse = responses.find(

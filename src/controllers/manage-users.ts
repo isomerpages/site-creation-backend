@@ -54,7 +54,7 @@ export default ({
 
   const { responses } = res.locals.submission as DecryptedContent
   const userInstructions = makeUserInstructions({ responses })
-  const to = [userInstructions.adminEmail, userInstructions.requesterEmail]
+  const to = [userInstructions.requesterEmail]
   const { teamName } = userInstructions
   const users = {
     ...userInstructions.users,
