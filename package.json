@@ -63,7 +63,7 @@
     "@opengovsg/formsg-sdk": "^0.8.2",
     "@types/morgan": "^1.9.1",
     "@types/nodemailer": "^6.4.0",
-    "@types/yargs": "^15.0.9",
+    "@types/yargs": "^16.0.0",
     "aws-sdk": "^2.788.0",
     "convict": "^6.0.0",
     "cross-fetch": "^3.0.6",
