@@ -83,14 +83,14 @@ function createCollections(collections: {
           path: `_${name}/${page}.md`,
           content: `---\ntitle: ${humanReadable(
             page
-          )}\npermalink: /${name}/${page}/\n---\n`, 
+          )}\npermalink: /${name}/${page}/\n---\n`,
         })
         collectionConfigYaml += `      - ${page}.md\n`
       } else {
         result.dirs.push({
-          path: `_${name}/${page}`
+          path: `_${name}/${page}`,
         })
-        subPages.forEach(subPage => {
+        subPages.forEach((subPage) => {
           result.files.push({
             path: `_${name}/${page}/${subPage}.md`,
             content: `---\ntitle: ${humanReadable(
