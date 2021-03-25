@@ -90,6 +90,11 @@ function createCollections(collections: {
         result.dirs.push({
           path: `_${name}/${page}`,
         })
+        result.files.push({
+          path: `_${name}/${page}/.keep`,
+          content: ``,
+        })
+        collectionConfigYaml += `      - ${page}/.keep\n`
         subPages.forEach((subPage) => {
           result.files.push({
             path: `_${name}/${page}/${subPage}.md`,
