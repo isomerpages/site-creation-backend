@@ -18,4 +18,9 @@ colors:
     - title: media-color-five
       color: '#00838f'
 
-
+plugins:
+   - jekyll-feed
+   - jekyll-assets
+   - jekyll-paginate
+   - jekyll-sitemap
+   - jekyll-remote-theme
