@@ -20,7 +20,8 @@ export default ({
           repo: `isomerpages/${repoName}`,
           private: false,
           branch: 'staging',
-          cmd: 'curl https://raw.githubusercontent.com/opengovsg/isomer-build/master/build.sh | bash -s -- -e staging',
+          cmd:
+            'curl https://raw.githubusercontent.com/opengovsg/isomer-build/master/build.sh | bash -s -- -e staging',
           dir: '_site/',
           installation_id: netlifyAppId,
         },
@@ -37,7 +38,8 @@ export default ({
           repo: `isomerpages/${repoName}`,
           private: false,
           branch: 'master',
-          cmd: 'curl https://raw.githubusercontent.com/opengovsg/isomer-build/master/build.sh | bash',
+          cmd:
+            'curl https://raw.githubusercontent.com/opengovsg/isomer-build/master/build.sh | bash',
           dir: '_site/',
           installation_id: netlifyAppId,
         },
