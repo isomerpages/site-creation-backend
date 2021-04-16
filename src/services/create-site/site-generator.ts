@@ -200,6 +200,7 @@ export default ({
   let configFile = fs.readFileSync(configPath, 'utf-8')
   configFile += resourceRoomOutput.configYaml
   configFile += ISOMER_CONFIG
+  configFile += `staging: https://${repoName}-staging.netlify.app\nprod: https://${repoName}-prod.netlify.app`
   fs.writeFileSync(configPath, configFile)
 
   let navFile = fs.readFileSync(navPath, 'utf-8')
