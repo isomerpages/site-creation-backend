@@ -26,6 +26,7 @@ plugins:
   - jekyll-assets
   - jekyll-paginate
   - jekyll-sitemap
+  - jekyll-remote-theme
 `
 
 export type SiteSpecification = {
