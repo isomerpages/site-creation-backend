@@ -26,6 +26,7 @@ plugins:
   - jekyll-assets
   - jekyll-paginate
   - jekyll-sitemap
+  - jekyll-remote-theme
 `
 
 export type SiteSpecification = {
@@ -70,42 +71,49 @@ function createCollections(collections: {
 }) {
   const result = {
     navYaml: '',
-    configYaml: '',
+    configYaml: [] as { path: string; content: string }[],
     files: [] as { path: string; content: string }[],
-  }
-  if (Object.keys(collections).length) {
-    result.configYaml += 'collections:\n'
+    dirs: [] as { path: string }[],
   }
   for (const [name, pages] of Object.entries(collections)) {
     const humanReadableName = humanReadable(name)
-    Object.entries(pages).forEach(([page, subPages], index) => {
+    let collectionConfigYaml = `collections:\n  ${name}:\n    output: true\n    order:\n`
+    Object.entries(pages).forEach(([page, subPages]) => {
       if (subPages.length === 0) {
         result.files.push({
-          path: `_${name}/${index}-${page}.md`,
+          path: `_${name}/${page}.md`,
           content: `---\ntitle: ${humanReadable(
             page
           )}\npermalink: /${name}/${page}/\n---\n`,
         })
+        collectionConfigYaml += `      - ${page}.md\n`
       } else {
-        // Impose a hard limit of `alphabet.length` sub-pages
-        // To keep the code simple
-        const alphabet = 'abcdefghijklmnopqrstuvwxyz'
-        subPages.slice(0, alphabet.length).forEach((subPage, subIndex) => {
+        result.dirs.push({
+          path: `_${name}/${page}`,
+        })
+        result.files.push({
+          path: `_${name}/${page}/.keep`,
+          content: ``,
+        })
+        collectionConfigYaml += `      - ${page}/.keep\n`
+        subPages.forEach((subPage) => {
           result.files.push({
-            path: `_${name}/${index}${alphabet.charAt(
-              subIndex
-            )}-${page}-${subPage}.md`,
+            path: `_${name}/${page}/${subPage}.md`,
             content: `---\ntitle: ${humanReadable(
               subPage
             )}\npermalink: /${name}/${page}/${subPage}\nthird_nav_title: ${humanReadable(
               page
             )}\n---\n`,
           })
+          collectionConfigYaml += `      - ${page}/${subPage}.md\n`
         })
       }
     })
     result.navYaml += `  - title: ${humanReadableName}\n    collection: ${name}\n`
-    result.configYaml += `  ${name}:\n    output: true\n`
+    result.configYaml.push({
+      path: `_${name}/collection.yml`,
+      content: collectionConfigYaml,
+    })
   }
   return result
 }
@@ -170,6 +178,12 @@ export default ({
   for (const name of Object.keys(collections)) {
     fs.mkdirpSync(`${destination}/_${name}`)
   }
+  for (const dir of collectionsOutput.dirs) {
+    fs.mkdirpSync(`${destination}/${dir.path}`)
+  }
+  for (const file of collectionsOutput.configYaml) {
+    fs.writeFileSync(`${destination}/${file.path}`, file.content)
+  }
   for (const file of collectionsOutput.files) {
     fs.writeFileSync(`${destination}/${file.path}`, file.content)
   }
@@ -185,9 +199,9 @@ export default ({
   }
 
   let configFile = fs.readFileSync(configPath, 'utf-8')
-  configFile += collectionsOutput.configYaml
   configFile += resourceRoomOutput.configYaml
   configFile += ISOMER_CONFIG
+  configFile += `staging: https://${repoName}-staging.netlify.app\nprod: https://${repoName}-prod.netlify.app`
   fs.writeFileSync(configPath, configFile)
 
   let navFile = fs.readFileSync(navPath, 'utf-8')

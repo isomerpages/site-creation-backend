@@ -20,7 +20,8 @@ export default ({
           repo: `isomerpages/${repoName}`,
           private: false,
           branch: 'staging',
-          cmd: 'JEKYLL_ENV=staging jekyll build',
+          cmd:
+            'curl https://raw.githubusercontent.com/opengovsg/isomer-build/master/build.sh | bash -s -- -e staging',
           dir: '_site/',
           installation_id: netlifyAppId,
         },
@@ -37,7 +38,8 @@ export default ({
           repo: `isomerpages/${repoName}`,
           private: false,
           branch: 'master',
-          cmd: 'jekyll build',
+          cmd:
+            'curl https://raw.githubusercontent.com/opengovsg/isomer-build/master/build.sh | bash',
           dir: '_site/',
           installation_id: netlifyAppId,
         },
