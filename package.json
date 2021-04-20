@@ -64,7 +64,7 @@
     "@types/morgan": "^1.9.1",
     "@types/nodemailer": "^6.4.0",
     "@types/yargs": "^15.0.9",
-    "aws-sdk": "^2.788.0",
+    "aws-sdk": "^2.889.0",
     "convict": "^6.0.0",
     "cross-fetch": "^3.0.6",
     "express": "^4.17.1",
