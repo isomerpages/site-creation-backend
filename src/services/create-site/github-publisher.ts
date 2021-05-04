@@ -20,7 +20,7 @@ export default ({
       org: 'isomerpages',
       name: repoName,
       description: `Staging: https://${repoName}-staging.netlify.app | Production: https://${repoName}-prod.netlify.app`,
-      visibility: 'public',
+      private: false,
     }),
     octokit.teams.create({
       org: 'isomerpages',
