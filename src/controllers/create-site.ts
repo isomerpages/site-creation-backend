@@ -4,7 +4,9 @@ import winston from 'winston'
 import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 
 import makeSiteSpecification from '../services/create-site/formsg-site-spec'
-import generateSite from '../services/create-site/site-generator'
+import generateSite, {
+  SiteSpecification,
+} from '../services/create-site/site-generator'
 
 const onSuccess = (repoName: string) => (supportEmail: string) => `
 The Isomer site for ${repoName} has been created successfully! 
@@ -21,6 +23,18 @@ The Isomer guide is available at https://v2.isomer.gov.sg.
 `
 
 const action = 'creating'
+
+// Base pages and folders to create
+const SAMPLE_PAGES = ['example-page']
+const SAMPLE_COLLECTION = {
+  'example-collection': {
+    'example-page': [],
+  },
+}
+const SAMPLE_RESOURCES = {
+  name: 'resources',
+  categories: ['example-category'],
+}
 
 export default (options: {
   publishToGitHub: (repoName: string) => Promise<number>
@@ -45,8 +59,7 @@ export default (options: {
   let statusCode = 201
 
   const { responses } = res.locals.submission as DecryptedContent
-  const siteSpecification = makeSiteSpecification({ responses })
-  const { repoName } = siteSpecification
+  const repoName = makeSiteSpecification({ responses })
 
   let to = ''
 
@@ -55,6 +68,13 @@ export default (options: {
   )
   if (requestorEmailResponse && requestorEmailResponse.answer) {
     to = requestorEmailResponse.answer
+  }
+
+  const siteSpecification: SiteSpecification = {
+    repoName: repoName,
+    pages: SAMPLE_PAGES,
+    collections: SAMPLE_COLLECTION,
+    resourceRoom: SAMPLE_RESOURCES,
   }
 
   try {
