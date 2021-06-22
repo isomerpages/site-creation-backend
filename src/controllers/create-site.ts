@@ -4,7 +4,7 @@ import winston from 'winston'
 import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 
 import makeSiteSpecification from '../services/create-site/formsg-site-spec'
-import generateSite from '../services/create-site/site-generator'
+import { generateFromBaseRepo } from '../services/create-site/site-generator'
 
 const onSuccess = (repoName: string) => (supportEmail: string) => `
 The Isomer site for ${repoName} has been created successfully! 
@@ -45,8 +45,7 @@ export default (options: {
   let statusCode = 201
 
   const { responses } = res.locals.submission as DecryptedContent
-  const siteSpecification = makeSiteSpecification({ responses })
-  const { repoName } = siteSpecification
+  const repoName = makeSiteSpecification({ responses })
 
   let to = ''
 
@@ -58,7 +57,7 @@ export default (options: {
   }
 
   try {
-    generateSite(siteSpecification)
+    await generateFromBaseRepo(repoName)
 
     logger?.info(`[${submissionId}] Publishing to GitHub`)
     const repoId = await publishToGitHub(repoName)
