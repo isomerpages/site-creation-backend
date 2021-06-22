@@ -4,9 +4,7 @@ import winston from 'winston'
 import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 
 import makeSiteSpecification from '../services/create-site/formsg-site-spec'
-import generateSite, {
-  SiteSpecification,
-} from '../services/create-site/site-generator'
+import { generateFromBaseRepo } from '../services/create-site/site-generator'
 
 const onSuccess = (repoName: string) => (supportEmail: string) => `
 The Isomer site for ${repoName} has been created successfully! 
@@ -23,18 +21,6 @@ The Isomer guide is available at https://v2.isomer.gov.sg.
 `
 
 const action = 'creating'
-
-// Base pages and folders to create
-const SAMPLE_PAGES = ['example-page']
-const SAMPLE_COLLECTION = {
-  'example-collection': {
-    'example-page': [],
-  },
-}
-const SAMPLE_RESOURCES = {
-  name: 'resources',
-  categories: ['example-category'],
-}
 
 export default (options: {
   publishToGitHub: (repoName: string) => Promise<number>
@@ -70,15 +56,8 @@ export default (options: {
     to = requestorEmailResponse.answer
   }
 
-  const siteSpecification: SiteSpecification = {
-    repoName: repoName,
-    pages: SAMPLE_PAGES,
-    collections: SAMPLE_COLLECTION,
-    resourceRoom: SAMPLE_RESOURCES,
-  }
-
   try {
-    generateSite(siteSpecification)
+    await generateFromBaseRepo(repoName)
 
     logger?.info(`[${submissionId}] Publishing to GitHub`)
     const repoId = await publishToGitHub(repoName)

@@ -1,4 +1,6 @@
 import fs from 'fs-extra'
+import git from 'isomorphic-git'
+import http from 'isomorphic-git/http/node'
 
 const ISOMER_CONFIG = `
 description: An Isomer site of the Singapore Government
@@ -152,6 +154,32 @@ function createResourceRoom(resourceRoom: {
     }
   }
   return result
+}
+
+export async function generateFromBaseRepo(repoName: string): Promise<void> {
+  // Clone base repo to /tmp
+  const destination = `/tmp/${repoName}`
+  const configPath = `${destination}/_config.yml`
+  const githubBaseRepoURL = 'https://github.com/isomerpages/site-creation-base'
+
+  await git.clone({
+    fs: fs,
+    http: http,
+    dir: destination,
+    ref: 'staging',
+    singleBranch: true,
+    url: githubBaseRepoURL,
+    depth: 1,
+  })
+  // Clear git
+  fs.removeSync(`${destination}/.git`)
+
+  // Edit config yml netlify links
+  const configFile = fs.readFileSync(configPath, 'utf-8')
+  const lines = configFile.split('\n').slice(0, -2)
+  lines.push(`staging: https://${repoName}-staging.netlify.app`)
+  lines.push(`prod: https://${repoName}-prod.netlify.app`)
+  fs.writeFileSync(configPath, configFile)
 }
 
 export default ({
