@@ -81,8 +81,8 @@ jobs:
         with:
           args: deploy --conceal -v
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOR_CICD }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOR_CICD }}
           GITHUB_ACCESS_TOKEN: ${{ secrets.LAMBDA_GITHUB_ACCESS_TOKEN }}
           NETLIFY_ACCESS_TOKEN: ${{ secrets.NETLIFY_ACCESS_TOKEN }}
           NETLIFY_APP_ID: ${{ secrets.NETLIFY_APP_ID }}
