@@ -24,7 +24,7 @@ export default (opts: {
         '0c550024-1d50-4ff8-9fdf-79870e8c7e68',
         `${repoName}.by.gov.sg`
       ),
-      addCloudflareCname(repoName, `${repoName}-prod.netlify.com`),
+      addCloudflareCname(repoName, `${repoName}-prod.netlify.app`),
     ])
   } catch (e) {
     statusCode = 400
