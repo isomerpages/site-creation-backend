@@ -108,19 +108,6 @@ const config = convict({
     default: 'thisissupersecretive',
     sensitive: true,
   },
-  cloudflareEmail: {
-    doc: 'Email of our CloudFlare account',
-    env: 'CLOUDFLARE_EMAIL',
-    format: 'required-string',
-    default: '',
-  },
-  cloudflareKey: {
-    doc: 'API key for our CloudFlare account',
-    env: 'CLOUDFLARE_KEY',
-    format: 'required-string',
-    sensitive: true,
-    default: '',
-  },
   cloudflareToken: {
     doc: 'API token for our CloudFlare account',
     env: 'CLOUDFLARE_TOKEN',

@@ -8,16 +8,26 @@ import getLiveSiteDetails from '../services/live-site/formsg-site-details'
 export default (options: {
   createApprovalLink: (opts: {
     repoName: string
+    domainName: string
     serverHostname: string
   }) => string
   sendApprovalEmail: (opts: {
     to: string
+    requesterEmail: string
+    repoName: string
+    domainName: string
     approvalLink: string
-    stagingSiteLink: string
+    previewLink: string
   }) => Promise<void>
+  supportEmail: string
   logger?: winston.Logger
 }) => async (req: Request, res: Response): Promise<void> => {
-  const { logger, createApprovalLink, sendApprovalEmail } = options
+  const {
+    logger,
+    supportEmail,
+    createApprovalLink,
+    sendApprovalEmail,
+  } = options
   const { submissionId } = req.body.data
 
   logger?.info(`[${submissionId}] Handling go-live request`)
@@ -25,21 +35,23 @@ export default (options: {
 
   const { responses } = res.locals.submission as DecryptedContent
 
-  const { repoName } = getLiveSiteDetails({
+  const { requesterEmail, repoName, domainName } = getLiveSiteDetails({
     responses,
   })
 
   try {
     const approvalLink = createApprovalLink({
       repoName,
+      domainName,
       serverHostname: req.hostname,
     })
     await sendApprovalEmail({
-      // hard-coding jackson's email here for demo purpose
-      // TODO: move this into an env variables maybe and make it a comma-separated list?
-      to: 'jackson@open.gov.sg',
+      to: supportEmail,
+      requesterEmail,
+      repoName,
+      domainName,
       approvalLink,
-      stagingSiteLink: `${repoName}-staging.netlify.com`,
+      previewLink: `https://${repoName}-prod.netlify.app`,
     })
   } catch (error) {
     statusCode = 400

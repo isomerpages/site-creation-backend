@@ -125,8 +125,6 @@ if (formLiveKey) {
   })
   const addCloudflareCname = makeCloudflareCnameAdder({
     cloudflare: new Cloudflare({
-      email: config.get('cloudflareEmail'),
-      key: config.get('cloudflareKey'),
       token: config.get('cloudflareToken'),
     }),
     zoneId: config.get('cloudflareZoneId'),
@@ -140,6 +138,7 @@ if (formLiveKey) {
     liveSite({
       createApprovalLink,
       sendApprovalEmail,
+      supportEmail,
       logger,
     })
   )
@@ -149,6 +148,7 @@ if (formLiveKey) {
       getRepoNameFromToken,
       addCloudflareCname,
       updateNetlifyDomainConfig,
+      logger,
     })
   )
 }
