@@ -21,6 +21,11 @@ import makeApprovalLinkCreator from './services/live-site/create-approval-link'
 import makeApprovalEmailSender from './services/live-site/send-approval-mail'
 import approveSite from './controllers/approve-site'
 
+import makeZoneCreator from './services/approve-site/create-keycdn-zone'
+import verifyDns from './services/approve-site/verify-dns'
+import makeZoneAliaser from './services/approve-site/add-zone-alias'
+import makeDomainRedirector from './services/approve-site/create-domain-redirect'
+
 import makeRepoNameFromTokenGetter from './services/approve-site/get-repo-name-from-token'
 import makeCloudflareCnameAdder from './services/approve-site/add-cloudflare-cname'
 import makeNetlifyDomainConfigUpdater from './services/approve-site/update-netlify-domain-config'
@@ -109,10 +114,10 @@ if (formUsersKey) {
 
 if (formLiveKey) {
   logger.info('Initializing middleware for /live')
-  // const keyCDNAccessToken = config.get('keyCDNAccessToken')
-  // const createKeyCDNZone = makeZoneCreator({ keyCDNAccessToken })
-  // const addZoneAlias = makeZoneAliaser({ keyCDNAccessToken })
-  // const createDomainRedirect = makeDomainRedirector({ octokit })
+  const keyCDNAccessToken = config.get('keyCDNAccessToken')
+  const createKeyCDNZone = makeZoneCreator({ keyCDNAccessToken })
+  const addZoneAlias = makeZoneAliaser({ keyCDNAccessToken })
+  const createDomainRedirect = makeDomainRedirector({ octokit })
   const createApprovalLink = makeApprovalLinkCreator({
     secretKey: jwtSecretKey,
   })
@@ -138,6 +143,8 @@ if (formLiveKey) {
     liveSite({
       createApprovalLink,
       sendApprovalEmail,
+      verifyDns,
+      mailOutcome,
       supportEmail,
       logger,
     })
@@ -145,6 +152,9 @@ if (formLiveKey) {
   app.get(
     '/approve',
     approveSite({
+      createKeyCDNZone,
+      addZoneAlias,
+      createDomainRedirect,
       getRepoNameFromToken,
       addCloudflareCname,
       updateNetlifyDomainConfig,

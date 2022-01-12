@@ -6,6 +6,7 @@ import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 import getLiveSiteDetails from '../services/live-site/formsg-site-details'
 
 export default (options: {
+  verifyDns: (domainName: string, repoName: string) => Promise<void>
   createApprovalLink: (opts: {
     repoName: string
     domainName: string
@@ -19,12 +20,22 @@ export default (options: {
     approvalLink: string
     previewLink: string
   }) => Promise<void>
+  mailOutcome: (options: {
+    to: string | string[]
+    submissionId: string
+    repoName: string
+    action: string
+    error?: Error
+    successText?: (supportEmail: string) => string
+  }) => Promise<void>
   supportEmail: string
   logger?: winston.Logger
 }) => async (req: Request, res: Response): Promise<void> => {
   const {
     logger,
     supportEmail,
+    verifyDns,
+    mailOutcome,
     createApprovalLink,
     sendApprovalEmail,
   } = options
@@ -40,6 +51,22 @@ export default (options: {
   })
 
   try {
+    if (!domainName.endsWith('by.gov.sg')) {
+      logger?.info(`[${submissionId}] Verifying DNS records`)
+      try {
+        await verifyDns(domainName, repoName)
+      } catch (error) {
+        await mailOutcome({
+          to: requesterEmail,
+          submissionId,
+          repoName,
+          action: 'go-live',
+          error,
+        })
+        throw error
+      }
+    }
+
     const approvalLink = createApprovalLink({
       repoName,
       domainName,

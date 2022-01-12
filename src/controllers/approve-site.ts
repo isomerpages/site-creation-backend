@@ -2,6 +2,11 @@ import { Request, Response } from 'express'
 import winston from 'winston'
 
 export default (opts: {
+  createKeyCDNZone: (
+    repoName: string
+  ) => Promise<{ zoneName: string; zoneId: number }>
+  addZoneAlias: (domainName: string, zoneId: number) => Promise<void>
+  createDomainRedirect: (domainName: string) => Promise<void>
   getRepoNameFromToken: (
     token: string
   ) => {
@@ -13,6 +18,9 @@ export default (opts: {
   logger?: winston.Logger
 }) => async (req: Request, res: Response): Promise<void> => {
   const {
+    createKeyCDNZone,
+    addZoneAlias,
+    createDomainRedirect,
     getRepoNameFromToken,
     updateNetlifyDomainConfig,
     addCloudflareCname,
@@ -22,11 +30,29 @@ export default (opts: {
   try {
     const { token } = req.query
     const { repoName, domainName } = getRepoNameFromToken(token as string)
-    // hardcoded site-id for demo purpose
-    // TODO: store this as part of the github repo during prod site creation
-    const netlifyName = `${repoName}-prod.netlify.app`
-    await addCloudflareCname(domainName, netlifyName)
-    await updateNetlifyDomainConfig(netlifyName, domainName)
+
+    if (domainName.endsWith('by.gov.sg')) {
+      const netlifyName = `${repoName}-prod.netlify.app`
+      logger?.info(
+        `[${domainName}] Adding Cloudflare CNAME alias to ${netlifyName}`
+      )
+      await addCloudflareCname(domainName, netlifyName)
+      logger?.info(`[${domainName}] Updating domain config for ${netlifyName}`)
+      await updateNetlifyDomainConfig(netlifyName, domainName)
+    } else {
+      logger?.info(`[${domainName}] Adding KeyCDN Zone`)
+      const { zoneId } = await createKeyCDNZone(repoName)
+
+      logger?.info(
+        `[${domainName}] Adding Zone Alias ${domainName} to ${zoneId}`
+      )
+      await addZoneAlias(domainName, zoneId)
+
+      if (domainName.startsWith('www.')) {
+        logger?.info(`[${domainName}] Filing pull request for ${domainName}`)
+        await createDomainRedirect(domainName)
+      }
+    }
   } catch (e) {
     statusCode = 400
     console.error(e)
