@@ -90,3 +90,6 @@ jobs:
           FORM_CREATE_KEY: ${{ secrets.FORM_CREATE_KEY }}
           FORM_USERS_KEY: ${{ secrets.FORM_USERS_KEY }}
           FORM_LIVE_KEY: ${{ secrets.FORM_LIVE_KEY }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
