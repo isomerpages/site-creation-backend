@@ -44,5 +44,12 @@ declare module 'netlify' {
       account_slug: string
       body: CreateSiteRequest
     }) => Promise<CreateSiteResponse>
+    getSite(request: { site_id: string }): Promise<{ site_id: string }>
+    updateSite(request: {
+      site_id: string
+      body: {
+        custom_domain: string
+      }
+    }): Promise<void>
   }
 }

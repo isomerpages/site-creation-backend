@@ -101,6 +101,27 @@ const config = convict({
     default: '',
     sensitive: true,
   },
+  jwtSecretKey: {
+    doc: 'Secret for jsonwebtoken signing',
+    env: 'JWT_SECRET_KEY',
+    format: '*',
+    default: 'thisissupersecretive',
+    sensitive: true,
+  },
+  cloudflareToken: {
+    doc: 'API token for our CloudFlare account',
+    env: 'CLOUDFLARE_TOKEN',
+    format: 'required-string',
+    sensitive: true,
+    default: '',
+  },
+  cloudflareZoneId: {
+    doc: 'Zone ID for our CloudFlare account',
+    env: 'CLOUDFLARE_ZONE_ID',
+    format: 'required-string',
+    sensitive: true,
+    default: '',
+  },
 })
 
 config.validate()

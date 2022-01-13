@@ -17,10 +17,19 @@ import makeOutcomeMailer from './services/outcome-mailer'
 
 import makeTeamManager from './services/manage-users/team-manager'
 
-import makeZoneCreator from './services/live-site/create-keycdn-zone'
-import verifyDns from './services/live-site/verify-dns'
-import makeZoneAliaser from './services/live-site/add-zone-alias'
-import makeDomainRedirector from './services/live-site/create-domain-redirect'
+import makeApprovalLinkCreator from './services/live-site/create-approval-link'
+import makeApprovalEmailSender from './services/live-site/send-approval-mail'
+import approveSite from './controllers/approve-site'
+
+import makeZoneCreator from './services/approve-site/create-keycdn-zone'
+import verifyDns from './services/approve-site/verify-dns'
+import makeZoneAliaser from './services/approve-site/add-zone-alias'
+import makeDomainRedirector from './services/approve-site/create-domain-redirect'
+
+import makeRepoNameFromTokenGetter from './services/approve-site/get-repo-name-from-token'
+import makeCloudflareCnameAdder from './services/approve-site/add-cloudflare-cname'
+import makeNetlifyDomainConfigUpdater from './services/approve-site/update-netlify-domain-config'
+import Cloudflare from 'cloudflare'
 
 const formCreateKey = config.get('formCreateKey')
 const formUsersKey = config.get('formUsersKey')
@@ -28,6 +37,10 @@ const formLiveKey = config.get('formLiveKey')
 const githubAccessToken = config.get('githubAccessToken')
 
 const supportEmail = config.get('supportEmail')
+
+const jwtSecretKey = config.get('jwtSecretKey')
+
+const netlifyAccessToken = config.get('netlifyAccessToken')
 
 const logger = winston.createLogger({
   format: winston.format.combine(
@@ -50,6 +63,7 @@ const transport =
           logger.info(`Mail sent - ${JSON.stringify(options, null, 2)}`),
       }
 
+const netlify = new NetlifyAPI(netlifyAccessToken)
 const app = express()
 
 app.use(morgan('common'))
@@ -62,7 +76,6 @@ const mailOutcome = makeOutcomeMailer({
 
 if (formCreateKey) {
   logger.info('Initializing middleware for /sites')
-  const netlifyAccessToken = config.get('netlifyAccessToken')
   const netlifyAppId = config.get('netlifyAppId')
 
   const publishToGitHub = makeGitHubPublisher({ octokit, githubAccessToken })
@@ -70,7 +83,7 @@ if (formCreateKey) {
     netlifyAccessToken && netlifyAppId
       ? makeNetlifyPublisher({
           netlifyAppId,
-          netlify: new NetlifyAPI(netlifyAccessToken),
+          netlify,
         })
       : () => Promise.resolve()
   app.post(
@@ -105,15 +118,46 @@ if (formLiveKey) {
   const createKeyCDNZone = makeZoneCreator({ keyCDNAccessToken })
   const addZoneAlias = makeZoneAliaser({ keyCDNAccessToken })
   const createDomainRedirect = makeDomainRedirector({ octokit })
+  const createApprovalLink = makeApprovalLinkCreator({
+    secretKey: jwtSecretKey,
+  })
+  const getRepoNameFromToken = makeRepoNameFromTokenGetter({
+    secretKey: jwtSecretKey,
+  })
+  const sendApprovalEmail = makeApprovalEmailSender({
+    transport,
+    supportEmail,
+  })
+  const addCloudflareCname = makeCloudflareCnameAdder({
+    cloudflare: new Cloudflare({
+      token: config.get('cloudflareToken'),
+    }),
+    zoneId: config.get('cloudflareZoneId'),
+  })
+  const updateNetlifyDomainConfig = makeNetlifyDomainConfigUpdater({
+    netlify,
+  })
   app.post(
     '/live',
     formsg({ formKey: formLiveKey, logger }),
     liveSite({
-      createKeyCDNZone,
+      createApprovalLink,
+      sendApprovalEmail,
       verifyDns,
+      mailOutcome,
+      supportEmail,
+      logger,
+    })
+  )
+  app.get(
+    '/approve',
+    approveSite({
+      createKeyCDNZone,
       addZoneAlias,
       createDomainRedirect,
-      mailOutcome,
+      getRepoNameFromToken,
+      addCloudflareCname,
+      updateNetlifyDomainConfig,
       logger,
     })
   )

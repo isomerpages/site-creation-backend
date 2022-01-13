@@ -5,35 +5,21 @@ import { DecryptedContent } from '@opengovsg/formsg-sdk/dist/types'
 
 import getLiveSiteDetails from '../services/live-site/formsg-site-details'
 
-const onSuccess = ({
-  repoName,
-  zoneName,
-  domainName,
-}: {
-  repoName: string
-  zoneName: string
-  domainName: string
-}) => () => `
-The Isomer site for ${repoName} has been made live successfully! 
-Please note the following:
-
-KeyCDN Zone at ${zoneName}
-
-Zone Aliased to ${domainName}
-
-If your domain name starts with www, a request has been filed
-to redirect your root domain to your www domain.
-`
-
-const action = 'creating'
-
 export default (options: {
-  createKeyCDNZone: (
+  verifyDns: (domainName: string, repoName: string) => Promise<void>
+  createApprovalLink: (opts: {
     repoName: string
-  ) => Promise<{ zoneName: string; zoneId: number }>
-  verifyDns: (repoName: string, zoneName: string) => Promise<void>
-  addZoneAlias: (domainName: string, zoneId: number) => Promise<void>
-  createDomainRedirect: (domainName: string) => Promise<void>
+    domainName: string
+    serverHostname: string
+  }) => string
+  sendApprovalEmail: (opts: {
+    to: string
+    requesterEmail: string
+    repoName: string
+    domainName: string
+    approvalLink: string
+    previewLink: string
+  }) => Promise<void>
   mailOutcome: (options: {
     to: string | string[]
     submissionId: string
@@ -42,51 +28,61 @@ export default (options: {
     error?: Error
     successText?: (supportEmail: string) => string
   }) => Promise<void>
+  supportEmail: string
   logger?: winston.Logger
 }) => async (req: Request, res: Response): Promise<void> => {
   const {
-    createKeyCDNZone,
-    verifyDns,
-    addZoneAlias,
-    createDomainRedirect,
-    mailOutcome,
     logger,
+    supportEmail,
+    verifyDns,
+    mailOutcome,
+    createApprovalLink,
+    sendApprovalEmail,
   } = options
   const { submissionId } = req.body.data
 
-  logger?.info(`[${submissionId}] Handling live-site submission`)
+  logger?.info(`[${submissionId}] Handling go-live request`)
   let statusCode = 200
 
   const { responses } = res.locals.submission as DecryptedContent
 
-  const { requesterEmail: to, repoName, domainName } = getLiveSiteDetails({
+  const { requesterEmail, repoName, domainName } = getLiveSiteDetails({
     responses,
   })
 
   try {
-    logger?.info(`[${submissionId}] Adding KeyCDN Zone`)
-    const { zoneName, zoneId } = await createKeyCDNZone(repoName)
-
-    logger?.info(`[${submissionId}] Verifying DNS records`)
-    await verifyDns(domainName, zoneName)
-
-    logger?.info(
-      `[${submissionId}] Adding Zone Alias ${domainName} to ${zoneId}`
-    )
-    await addZoneAlias(domainName, zoneId)
-
-    if (domainName.startsWith('www.')) {
-      logger?.info(`[${submissionId}] Filing pull request for ${domainName}`)
-      await createDomainRedirect(domainName)
+    if (!domainName.endsWith('by.gov.sg')) {
+      logger?.info(`[${submissionId}] Verifying DNS records`)
+      try {
+        await verifyDns(domainName, repoName)
+      } catch (error) {
+        await mailOutcome({
+          to: requesterEmail,
+          submissionId,
+          repoName,
+          action: 'go-live',
+          error,
+        })
+        throw error
+      }
     }
 
-    logger?.info(`[${submissionId}] Mailing outcome`)
-    const successText = onSuccess({ repoName, zoneName, domainName })
-    await mailOutcome({ to, submissionId, repoName, action, successText })
+    const approvalLink = createApprovalLink({
+      repoName,
+      domainName,
+      serverHostname: req.hostname,
+    })
+    await sendApprovalEmail({
+      to: supportEmail,
+      requesterEmail,
+      repoName,
+      domainName,
+      approvalLink,
+      previewLink: `https://${repoName}-prod.netlify.app`,
+    })
   } catch (error) {
     statusCode = 400
     logger?.error(error)
-    await mailOutcome({ to, submissionId, repoName, action, error })
   } finally {
     const message =
       statusCode !== 200 ? 'Request processed with errors' : 'Request processed'
