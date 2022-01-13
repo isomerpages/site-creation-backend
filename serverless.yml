@@ -43,8 +43,22 @@ functions:
     timeout: 30
     environment:
       FORM_LIVE_KEY: ${env:FORM_LIVE_KEY}
-      KEYCDN_ACCESS_TOKEN: ${env:KEYCDN_ACCESS_TOKEN}
+      JWT_SECRET_KEY: ${env:JWT_SECRET_KEY}
     events:
       - http:
           path: live
           method: post
+  approve:
+    handler: dist/serverless.handler
+    timeout: 30
+    environment:
+      JWT_SECRET_KEY: ${env:JWT_SECRET_KEY}
+      KEYCDN_ACCESS_TOKEN: ${env:KEYCDN_ACCESS_TOKEN}
+      CLOUDFLARE_TOKEN: ${env:CLOUDFLARE_TOKEN}
+      CLOUDFLARE_ZONE_ID: ${env:CLOUDFLARE_ZONE_ID}
+      NETLIFY_ACCESS_TOKEN: ${env:NETLIFY_ACCESS_TOKEN}
+      NETLIFY_APP_ID: ${env:NETLIFY_APP_ID}
+    events:
+      - http:
+          path: approve
+          method: get
