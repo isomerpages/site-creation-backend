@@ -52,6 +52,7 @@ functions:
     handler: dist/serverless.handler
     timeout: 30
     environment:
+      FORM_LIVE_KEY: ${env:FORM_LIVE_KEY}
       JWT_SECRET_KEY: ${env:JWT_SECRET_KEY}
       KEYCDN_ACCESS_TOKEN: ${env:KEYCDN_ACCESS_TOKEN}
       CLOUDFLARE_TOKEN: ${env:CLOUDFLARE_TOKEN}
