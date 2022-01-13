@@ -111,14 +111,14 @@ const config = convict({
   cloudflareToken: {
     doc: 'API token for our CloudFlare account',
     env: 'CLOUDFLARE_TOKEN',
-    format: 'required-string',
+    format: '*',
     sensitive: true,
     default: '',
   },
   cloudflareZoneId: {
     doc: 'Zone ID for our CloudFlare account',
     env: 'CLOUDFLARE_ZONE_ID',
-    format: 'required-string',
+    format: '*',
     sensitive: true,
     default: '',
   },
