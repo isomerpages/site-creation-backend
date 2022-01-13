@@ -10,17 +10,26 @@ export default ({
   supportEmail: string
 }) => async ({
   to,
+  requesterEmail,
+  repoName,
+  domainName,
   approvalLink,
-  stagingSiteLink,
+  previewLink,
 }: {
   to: string
+  requesterEmail: string
+  repoName: string
+  domainName: string
   approvalLink: string
-  stagingSiteLink: string
+  previewLink: string
 }): Promise<void> => {
-  const subject = '[Isomer] Going live request'
-  const html = `There's a new request for site going live
+  const subject = '[Isomer] Go-Live Request'
+  const html = `There's a new request for a site go-live from ${requesterEmail}.
 
-- Preview site <a href="${stagingSiteLink}">here</a>
+Repository: ${repoName}
+Target Domain: ${domainName}
+
+- Preview site: <a href="${previewLink}">${previewLink}</a>
 
 Click on <a href="${approvalLink}">this link</a> to approve this site deployment
 `
