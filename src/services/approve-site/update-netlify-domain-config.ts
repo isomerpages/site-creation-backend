@@ -1,4 +1,5 @@
 import NetlifyAPI from 'netlify'
+import promiseRetry from 'promise-retry'
 
 export default ({ netlify }: { netlify: NetlifyAPI }) => async (
   netlifyName: string,
@@ -13,4 +14,15 @@ export default ({ netlify }: { netlify: NetlifyAPI }) => async (
       custom_domain: domain,
     },
   })
+
+  await promiseRetry(
+    async (retry) => {
+      return netlify
+        .provisionSiteTLSCertificate({
+          site_id: siteId,
+        })
+        .catch(retry)
+    },
+    { retries: 25 }
+  )
 }
