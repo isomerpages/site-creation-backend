@@ -51,5 +51,6 @@ declare module 'netlify' {
         custom_domain: string
       }
     }): Promise<void>
+    provisionSiteTLSCertificate(request: { site_id: string }): Promise<void>
   }
 }
