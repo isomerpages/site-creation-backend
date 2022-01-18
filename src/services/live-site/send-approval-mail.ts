@@ -24,14 +24,23 @@ export default ({
   previewLink: string
 }): Promise<void> => {
   const subject = '[Isomer] Go-Live Request'
-  const html = `There's a new request for a site go-live from ${requesterEmail}.
+  const html = `<p>There's a new request for a site go-live from ${requesterEmail}.</p>
 
-Repository: ${repoName}
+<p>
+Repository: ${repoName} <br/>
 Target Domain: ${domainName}
+</p>
 
-- Preview site: <a href="${previewLink}">${previewLink}</a>
+<p>
+Preview site: <a href="${previewLink}">${previewLink}</a>
+</p>
 
-Click on <a href="${approvalLink}">this link</a> to approve this site deployment
+<p>
+Use the following URL to approve this site deployment:<br/>
+<pre>
+${approvalLink}
+</pre>
+</p>
 `
 
   await transport.sendMail({
