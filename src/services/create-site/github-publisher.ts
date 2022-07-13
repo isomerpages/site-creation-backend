@@ -57,7 +57,6 @@ export default ({
     dir,
     remote,
     remoteRef: 'staging',
-    corsProxy: 'https://cors.isomorphic-git.org',
     onAuth: () => ({ username: 'user', password: githubAccessToken }),
   })
   await git.push({
@@ -66,7 +65,6 @@ export default ({
     dir,
     remote,
     remoteRef: 'master',
-    corsProxy: 'https://cors.isomorphic-git.org',
     onAuth: () => ({ username: 'user', password: githubAccessToken }),
   })
 
